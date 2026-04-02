@@ -7,6 +7,7 @@ import { Point, LineString } from 'ol/geom';
 import { Style, Icon, Stroke, Fill, Circle as CircleStyle } from 'ol/style';
 import { fromLonLat, toLonLat, transformExtent } from 'ol/proj';
 import { Geolocation } from '@capacitor/geolocation';
+import { Zoom } from 'ol/control';
 
 export enum TipoResiduo {
   PLASTICO = 'plastico',
@@ -60,6 +61,11 @@ export class MapaService {
       layers: [
         new TileLayer({
           source: new OSM()
+        })
+      ],
+      controls: [
+        new Zoom({
+          className: 'ol-zoom ecox-zoom'
         })
       ],
       view: new View({

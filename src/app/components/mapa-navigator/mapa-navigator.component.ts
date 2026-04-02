@@ -124,6 +124,32 @@ import { MapaService, PuntoRecogida, RutaUsuario } from '../../services/mapa.ser
       color: var(--ecox-secondary);
       font-size: 0.8em;
     }
+
+    /* OpenLayers Zoom Controls - Position at bottom right */
+    ::ng-deep .ecox-zoom {
+      top: auto !important;
+      left: auto !important;
+      right: 16px !important;
+      bottom: calc(40vh + 16px) !important;
+    }
+
+    ::ng-deep .ecox-zoom button {
+      background-color: var(--ecox-card) !important;
+      color: var(--ecox-accent) !important;
+      border: 1px solid var(--ecox-accent) !important;
+      border-radius: 8px !important;
+      margin: 4px 0 !important;
+      width: 36px !important;
+      height: 36px !important;
+      font-size: 18px !important;
+      font-weight: bold !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+    }
+
+    ::ng-deep .ecox-zoom button:hover {
+      background-color: var(--ecox-accent) !important;
+      color: var(--ecox-bg) !important;
+    }
   `]
 })
 export class MapaNavigatorComponent implements OnInit, OnDestroy {
