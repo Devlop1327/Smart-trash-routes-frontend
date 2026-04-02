@@ -1,0 +1,78 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Dashboard</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="dashboard-container">
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      @for (stat of stats(); track stat.title) {
+        <div class="stat-card {{ stat.color }}">
+          <div class="stat-icon">
+            <ion-icon [name]="stat.icon"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <h3>{{ stat.value }}</h3>
+            <p>{{ stat.title }}</p>
+            @if (stat.trend) {
+              <small class="trend">{{ stat.trend }}</small>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section">
+      <h2>Acciones Rápidas</h2>
+      <div class="quick-actions">
+        <ion-button expand="block" routerLink="/mapa" class="action-btn primary">
+          <ion-icon name="map-outline" slot="start"></ion-icon>
+          Ver Mapa de Rutas
+        </ion-button>
+        <ion-button expand="block" routerLink="/reportar" class="action-btn secondary">
+          <ion-icon name="camera-outline" slot="start"></ion-icon>
+          Reportar Residuo
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Puntos de Recogida Cercanos -->
+    <div class="section">
+      <h2>Puntos de Recogida Cercanos</h2>
+      <ion-list class="ecox-list">
+        @for (punto of puntosRecogida().slice(0, 3); track punto.id) {
+          <ion-item routerLink="/mapa" [queryParams]="{ punto: punto.id }">
+            <div class="tipo-badge {{ punto.tipo }}" slot="start"></div>
+            <ion-label>
+              <h3>{{ punto.nombre }}</h3>
+              <p>{{ punto.direccion }}</p>
+              <small>{{ punto.horario }}</small>
+            </ion-label>
+            <ion-icon name="chevron-forward" slot="end"></ion-icon>
+          </ion-item>
+        }
+      </ion-list>
+    </div>
+
+    <!-- Tipos de Residuos -->
+    <div class="section">
+      <h2>Tipos de Residuos Aceptados</h2>
+      <div class="residuos-grid">
+        @for (tipo of tiposResiduo; track tipo.key) {
+          <div class="residuo-item">
+            <div class="residuo-icon {{ tipo.key }}">
+              <ion-icon [name]="tipo.icon"></ion-icon>
+            </div>
+            <span>{{ tipo.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</ion-content>

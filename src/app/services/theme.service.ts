@@ -34,6 +34,14 @@ export class ThemeService {
   private setTheme(isDark: boolean): void {
     this.isDarkSignal.set(isDark);
     document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    
+    // Add/remove Ionic dark palette classes for proper theming
+    document.body.classList.toggle('ion-palette-dark', isDark);
+    document.documentElement.classList.toggle('ion-palette-dark', isDark);
+    
+    // Also add the 'dark' class for compatibility
+    document.body.classList.toggle('dark', isDark);
+    document.documentElement.classList.toggle('dark', isDark);
   }
 
   private async saveTheme(isDark: boolean): Promise<void> {

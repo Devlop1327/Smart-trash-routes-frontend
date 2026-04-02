@@ -1,0 +1,23 @@
+ion-content {
+  --background: var(--ecox-bg);
+}
+
+ion-list {
+  background: var(--ecox-card);
+  margin: 16px;
+  border-radius: 12px;
+}
+
+ion-list-header {
+  background: var(--ecox-card);
+  margin: 16px 16px 0 16px;
+  border-radius: 12px 12px 0 0;
+}
+
+ion-item {
+  --background: transparent;
+}
+
+ion-note {
+  color: var(--ecox-secondary);
+}

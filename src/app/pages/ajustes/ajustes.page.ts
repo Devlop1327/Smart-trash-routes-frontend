@@ -1,90 +1,48 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
+import { Geolocation } from '@capacitor/geolocation';
 import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-ajustes',
   standalone: true,
   imports: [CommonModule, IonicModule],
-  template: `
-    <ion-header [translucent]="true">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
-        </ion-buttons>
-        <ion-title>Ajustes</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content [fullscreen]="true">
-      <ion-list>
-        <ion-item>
-          <ion-label>Tema Oscuro</ion-label>
-          <ion-toggle 
-            [checked]="isDark()" 
-            (ionChange)="toggleTheme()">
-          </ion-toggle>
-        </ion-item>
-
-        <ion-item>
-          <ion-label>Notificaciones</ion-label>
-          <ion-toggle [checked]="true"></ion-toggle>
-        </ion-item>
-
-        <ion-item>
-          <ion-label>GPS Siempre Activo</ion-label>
-          <ion-toggle [checked]="false"></ion-toggle>
-        </ion-item>
-      </ion-list>
-
-      <ion-list-header>
-        <ion-label>Información</ion-label>
-      </ion-list-header>
-
-      <ion-list>
-        <ion-item>
-          <ion-label>Versión</ion-label>
-          <ion-note slot="end">1.0.0</ion-note>
-        </ion-item>
-
-        <ion-item>
-          <ion-label>Desarrollado por</ion-label>
-          <ion-note slot="end">STR Team</ion-note>
-        </ion-item>
-      </ion-list>
-    </ion-content>
-  `,
-  styles: [`
-    ion-content {
-      --background: var(--ecox-bg);
-    }
-
-    ion-list {
-      background: var(--ecox-card);
-      margin: 16px;
-      border-radius: 12px;
-    }
-
-    ion-list-header {
-      background: var(--ecox-card);
-      margin: 16px 16px 0 16px;
-      border-radius: 12px 12px 0 0;
-    }
-
-    ion-item {
-      --background: transparent;
-    }
-
-    ion-note {
-      color: var(--ecox-secondary);
-    }
-  `]
+  templateUrl: './ajustes.page.html',
+  styleUrls: ['./ajustes.page.scss'],
 })
-export class AjustesPage {
+export class AjustesPage implements OnInit {
   isDark = this.themeService.isDark;
+  gpsAlwaysActive = signal<boolean>(false);
 
   constructor(private themeService: ThemeService) {}
+
+  async ngOnInit() {
+    await this.checkGpsPermission();
+  }
+
+  private async checkGpsPermission(): Promise<void> {
+    try {
+      const permission = await Geolocation.requestPermissions();
+      // Check if location permission is granted
+      const hasLocation = permission.location === 'granted';
+      this.gpsAlwaysActive.set(hasLocation);
+    } catch (error) {
+      console.error('Error checking GPS permission:', error);
+      this.gpsAlwaysActive.set(false);
+    }
+  }
+
+  async toggleGpsAlways(): Promise<void> {
+    try {
+      const permission = await Geolocation.requestPermissions();
+      const isGranted = permission.location === 'granted';
+      this.gpsAlwaysActive.set(isGranted);
+    } catch (error) {
+      console.error('Error requesting GPS permission:', error);
+      this.gpsAlwaysActive.set(false);
+    }
+  }
 
   toggleTheme() {
     this.themeService.toggleTheme();
