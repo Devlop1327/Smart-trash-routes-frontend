@@ -1,0 +1,62 @@
+// Paleta Raíz (Variables compartidas y Tema Oscuro por defecto)
+:root {
+  --ion-font-family: 'Inter', sans-serif;
+
+  // ECOX DARK (Logo Style)
+  &[data-theme='dark'] {
+    --ecox-bg: #121212;
+    --ecox-card: #1e1e1e;
+    --ecox-accent: #50fa7b; // Verde esmeralda neón
+    --ecox-secondary: #8be9fd; // Turquesa
+    --ion-text-color: #ffffff;
+    
+    --ion-color-primary: var(--ecox-accent);
+    --ion-background-color: var(--ecox-bg);
+  }
+
+  // ECOX AMBIENTAL (Tema Claro)
+  &[data-theme='light'] {
+    --ecox-bg: #f5f5f0;
+    --ecox-card: #ffffff;
+    --ecox-accent: #2e7d32; // Verde hoja natural
+    --ecox-secondary: #795548; // Tono tierra
+    --ion-text-color: #1b1b1b;
+
+    --ion-color-primary: var(--ecox-accent);
+    --ion-background-color: var(--ecox-bg);
+  }
+}
+
+// Aplicación de variables a componentes de Ionic
+ion-card {
+  --background: var(--ecox-card);
+  border-radius: 12px;
+}
+
+ion-content {
+  --background: var(--ecox-bg);
+}
+
+ion-toolbar {
+  --background: var(--ecox-card);
+  --color: var(--ion-text-color);
+}
+
+ion-item {
+  --background: var(--ecox-card);
+  --color: var(--ion-text-color);
+}
+
+ion-list {
+  background: var(--ecox-card);
+}
+
+ion-button {
+  --color: var(--ecox-bg);
+  
+  &[color='primary'] {
+    --background: var(--ecox-accent);
+    --background-hover: var(--ecox-accent);
+    --background-activated: var(--ecox-accent);
+  }
+}

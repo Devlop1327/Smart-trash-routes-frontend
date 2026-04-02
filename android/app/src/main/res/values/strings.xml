@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Smart Trash Routes</string>
+    <string name="title_activity_main">Smart Trash Routes</string>
+    <string name="package_name">com.smarttrash.routes</string>
+    <string name="custom_url_scheme">com.smarttrash.routes</string>
+</resources>
