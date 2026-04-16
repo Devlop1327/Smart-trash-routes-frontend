@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { MapaService, PuntoRecogida, RutaUsuario } from '../../services/mapa.service';
@@ -152,14 +152,16 @@ import { MapaService, PuntoRecogida, RutaUsuario } from '../../services/mapa.ser
     }
   `]
 })
-export class MapaNavigatorComponent implements OnInit, OnDestroy {
+export class MapaNavigatorComponent implements OnInit, AfterViewInit, OnDestroy {
   puntosRecogida = this.mapaService.puntosRecogidaSignal;
   rutaActual = this.mapaService.rutaActualSignal;
   posicionUsuario = this.mapaService.posicionUsuarioSignal;
 
   constructor(private mapaService: MapaService) {}
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ngAfterViewInit() {
     this.mapaService.inicializarMapa('mapa');
   }
 

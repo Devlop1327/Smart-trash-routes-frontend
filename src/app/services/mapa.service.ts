@@ -4,10 +4,11 @@ import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { Feature } from 'ol';
 import { Point, LineString } from 'ol/geom';
-import { Style, Icon, Stroke, Fill, Circle as CircleStyle } from 'ol/style';
+import { Style, Icon, Stroke, Fill, Circle as CircleStyle, Text } from 'ol/style';
 import { fromLonLat, toLonLat, transformExtent } from 'ol/proj';
 import { Geolocation } from '@capacitor/geolocation';
 import { Zoom } from 'ol/control';
+import { GeoJSON } from 'ol/format';
 
 export enum TipoResiduo {
   PLASTICO = 'plastico',
@@ -39,6 +40,7 @@ export interface RutaUsuario {
 export class MapaService {
   private mapa: Map | null = null;
   private capaRuta: VectorLayer | null = null;
+  private capaCalles: VectorLayer | null = null;
   private posicionUsuario = signal<[number, number] | null>(null);
   private puntosRecogida = signal<PuntoRecogida[]>([]);
   private rutaActual = signal<RutaUsuario | null>(null);
@@ -78,7 +80,105 @@ export class MapaService {
     });
 
     this.obtenerPosicionActual();
+    this.cargarCallesBuenaventura();
     return this.mapa;
+  }
+
+  private async cargarCallesBuenaventura(): Promise<void> {
+    if (!this.mapa) return;
+
+    try {
+      const response = await fetch('assets/data/buenaventura-streets.geojson');
+      if (!response.ok) {
+        console.warn('No se encontró el archivo de calles de Buenaventura');
+        return;
+      }
+
+      const geojson = await response.json();
+
+      const vectorSource = new VectorSource({
+        features: new GeoJSON().readFeatures(geojson, {
+          featureProjection: 'EPSG:3857'
+        })
+      });
+
+      // Estilo dinámico basado en propiedades
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const styleFunction = (feature: any): Style => {
+        const name = feature.get('name');
+        const highway = feature.get('highway');
+        
+        // Colores según tipo de vía - Colores brillantes del tema Ecox
+        let color = '#00E5FF'; // Cyan brillante por defecto
+        let width = 2;
+        
+        switch (highway) {
+          case 'primary':
+            color = '#00FF88'; // Verde esmeralda neón brillante
+            width = 4;
+            break;
+          case 'secondary':
+            color = '#00FF88'; // Verde esmeralda neón
+            width = 3;
+            break;
+          case 'tertiary':
+            color = '#00E5FF'; // Cyan brillante
+            width = 2.5;
+            break;
+          case 'residential':
+            color = '#FFB800'; // Amarillo dorado brillante
+            width = 2;
+            break;
+          case 'pedestrian':
+            color = '#FF6B6B'; // Coral brillante
+            width = 2;
+            break;
+          case 'unclassified':
+          case 'service':
+            color = '#C084FC'; // Púrpura brillante
+            width = 1.5;
+            break;
+          default:
+            color = '#00E5FF'; // Cyan
+            width = 1.5;
+        }
+
+        const style = new Style({
+          stroke: new Stroke({
+            color: color,
+            width: width
+          })
+        });
+
+        // Mostrar nombre solo en vías principales - texto BLANCO con halo negro
+        if (name && ['primary', 'secondary', 'tertiary'].includes(highway)) {
+          style.setText(new Text({
+            text: name,
+            font: 'bold 10px Inter, sans-serif',
+            fill: new Fill({ color: '#ffffff' }), // Texto BLANCO puro
+            stroke: new Stroke({ color: '#000000', width: 4 }), // Halo negro grueso para contraste
+            offsetY: -10,
+            overflow: true,
+            placement: 'line'
+          }));
+        }
+
+        return style;
+      };
+
+      this.capaCalles = new VectorLayer({
+        source: vectorSource,
+        style: styleFunction,
+        properties: { name: 'calles-buenaventura' },
+        zIndex: 5 // Entre el mapa base (0) y los puntos de recogida (10)
+      });
+
+      this.mapa.addLayer(this.capaCalles);
+      console.log(`✅ Calles de Buenaventura cargadas: ${geojson.features?.length || 0} vías`);
+
+    } catch (error) {
+      console.error('Error cargando calles de Buenaventura:', error);
+    }
   }
 
   async obtenerPosicionActual(): Promise<void> {
