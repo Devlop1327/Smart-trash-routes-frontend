@@ -1,31 +1,66 @@
 <ion-app>
-  <ion-menu contentId="main-content">
-    <ion-header>
-      <ion-toolbar>
+  <!-- Menú lateral (hamburguesa) -->
+  <ion-menu contentId="main-content" class="premium-menu">
+    <ion-header class="ion-no-border">
+      <ion-toolbar class="menu-toolbar">
         <ion-title>Smart Trash Routes</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content class="ion-padding">
-      <ion-list>
-        <ion-item routerLink="/dashboard" routerDirection="root">
-          <ion-icon name="home" slot="start"></ion-icon>
-          <ion-label>Dashboard</ion-label>
+    
+    <ion-content class="menu-content">
+      <div class="menu-user-profile">
+        <div class="avatar">
+          <ion-icon name="person"></ion-icon>
+        </div>
+        <div class="user-info">
+        </div>
+      </div>
+
+      <ion-list class="menu-list" lines="none">
+        <ion-item class="menu-item" routerLink="/dashboard" routerDirection="root" routerLinkActive="active">
+          <div class="item-icon-bg">
+            <ion-icon name="home"></ion-icon>
+          </div>
+          <ion-label>Inicio</ion-label>
         </ion-item>
-        <ion-item routerLink="/mapa" routerDirection="root">
-          <ion-icon name="map" slot="start"></ion-icon>
+        
+        <ion-item class="menu-item" routerLink="/mapa" routerDirection="root" routerLinkActive="active">
+          <div class="item-icon-bg">
+            <ion-icon name="map"></ion-icon>
+          </div>
           <ion-label>Mapa de Rutas</ion-label>
         </ion-item>
-        <ion-item routerLink="/reportar" routerDirection="root">
-          <ion-icon name="camera" slot="start"></ion-icon>
+        
+        <ion-item class="menu-item" routerLink="/reportar" routerDirection="root" routerLinkActive="active">
+          <div class="item-icon-bg">
+            <ion-icon name="camera"></ion-icon>
+          </div>
           <ion-label>Reportar Residuo</ion-label>
         </ion-item>
-        <ion-item routerLink="/ajustes" routerDirection="root">
-          <ion-icon name="settings" slot="start"></ion-icon>
+        
+        <ion-item class="menu-item" routerLink="/ajustes" routerDirection="root" routerLinkActive="active">
+          <div class="item-icon-bg">
+            <ion-icon name="settings"></ion-icon>
+          </div>
           <ion-label>Ajustes</ion-label>
         </ion-item>
       </ion-list>
+      
+      <!-- Tema oscuro/claro toggle -->
+      <div class="theme-toggle-container">
+        <ion-item lines="none" class="theme-toggle-item">
+          @if (themeService.isDark()) {
+            <ion-icon name="moon" slot="start"></ion-icon>
+          } @else {
+            <ion-icon name="sunny" slot="start"></ion-icon>
+          }
+          <ion-label>{{ themeService.isDark() ? 'Modo Oscuro' : 'Modo Claro' }}</ion-label>
+          <ion-toggle [checked]="themeService.isDark()" (ionChange)="themeService.toggleTheme()" slot="end" color="success"></ion-toggle>
+        </ion-item>
+      </div>
     </ion-content>
   </ion-menu>
+
   <div class="ion-page" id="main-content">
     <ion-router-outlet></ion-router-outlet>
   </div>

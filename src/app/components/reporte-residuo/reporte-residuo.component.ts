@@ -4,156 +4,16 @@ import { IonicModule } from '@ionic/angular';
 import { FormBuilder, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
+import { ActionSheetController, ToastController } from '@ionic/angular';
+import { HttpClient } from '@angular/common/http';
 import { TipoResiduo } from '../../services/mapa.service';
 
 @Component({
   selector: 'app-reporte-residuo',
   standalone: true,
   imports: [CommonModule, IonicModule, ReactiveFormsModule],
-  template: `
-    <ion-header [translucent]="true">
-      <ion-toolbar>
-        <ion-title>Reportar Residuo</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    
-    <ion-content [fullscreen]="true">
-      <form [formGroup]="reporteForm" class="reporte-form">
-        <ion-item>
-          <ion-label position="stacked">Tipo de Residuo</ion-label>
-          <ion-select formControlName="tipo" placeholder="Selecciona el tipo">
-            @for (tipo of tiposResiduo; track tipo.value) {
-              <ion-select-option [value]="tipo.value">
-                {{ tipo.label }}
-              </ion-select-option>
-            }
-          </ion-select>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="stacked">Descripción</ion-label>
-          <ion-textarea 
-            formControlName="descripcion" 
-            placeholder="Describe el residuo y su ubicación..."
-            rows="4">
-          </ion-textarea>
-        </ion-item>
-
-        <ion-item>
-          <ion-label position="stacked">Cantidad</ion-label>
-          <ion-input 
-            formControlName="cantidad" 
-            type="number" 
-            placeholder="Ej: 5 kg">
-          </ion-input>
-        </ion-item>
-
-        <div class="foto-section">
-          <h4>Evidencia Fotográfica</h4>
-          @if (imagenPreview()) {
-            <div class="preview-container">
-              <img [src]="imagenPreview()" alt="Preview" class="preview-image" />
-              <ion-button 
-                (click)="eliminarFoto()" 
-                color="danger" 
-                fill="clear" 
-                size="small">
-                <ion-icon name="trash"></ion-icon>
-              </ion-button>
-            </div>
-          } @else {
-            <ion-button 
-              (click)="tomarFoto()" 
-              expand="block" 
-              fill="outline">
-              <ion-icon name="camera" slot="start"></ion-icon>
-              Tomar Foto
-            </ion-button>
-          }
-        </div>
-
-        <div class="ubicacion-section">
-          <h4>Ubicación Actual</h4>
-          @if (ubicacion()) {
-            <div class="ubicacion-info">
-              <p><strong>Lat:</strong> {{ ubicacion()?.latitude?.toFixed(6) || 'N/A' }}</p>
-              <p><strong>Lng:</strong> {{ ubicacion()?.longitude?.toFixed(6) || 'N/A' }}</p>
-              <ion-button 
-                (click)="actualizarUbicacion()" 
-                fill="clear" 
-                size="small">
-                <ion-icon name="refresh"></ion-icon>
-                Actualizar
-              </ion-button>
-            </div>
-          } @else {
-            <ion-button 
-              (click)="actualizarUbicacion()" 
-              expand="block" 
-              fill="outline">
-              <ion-icon name="location" slot="start"></ion-icon>
-              Obtener Ubicación
-            </ion-button>
-          }
-        </div>
-
-        <div class="acciones">
-          <ion-button 
-            type="submit" 
-            expand="block" 
-            [disabled]="!reporteForm.valid || !imagenPreview() || !ubicacion()"
-            (click)="enviarReporte()">
-            <ion-icon name="send" slot="start"></ion-icon>
-            Enviar Reporte
-          </ion-button>
-        </div>
-      </form>
-    </ion-content>
-  `,
-  styles: [`
-    .reporte-form {
-      padding: 16px;
-    }
-
-    .foto-section, .ubicacion-section {
-      margin: 20px 0;
-      padding: 16px;
-      background: var(--ecox-card);
-      border-radius: 8px;
-    }
-
-    .foto-section h4, .ubicacion-section h4 {
-      margin: 0 0 12px 0;
-      color: var(--ecox-accent);
-    }
-
-    .preview-container {
-      position: relative;
-      text-align: center;
-    }
-
-    .preview-image {
-      max-width: 100%;
-      max-height: 200px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-
-    .ubicacion-info {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .ubicacion-info p {
-      margin: 0;
-      font-size: 0.9em;
-    }
-
-    .acciones {
-      margin-top: 24px;
-    }
-  `]
+  templateUrl: './reporte-residuo.component.html',
+  styleUrls: ['./reporte-residuo.component.scss']
 })
 export class ReporteResiduoComponent {
   reporteForm: FormGroup;
@@ -168,8 +28,15 @@ export class ReporteResiduoComponent {
     { value: TipoResiduo.ESPECIAL, label: 'Especial' }
   ];
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder, 
+    private actionSheetCtrl: ActionSheetController,
+    private toastCtrl: ToastController,
+    private http: HttpClient
+  ) {
     this.reporteForm = this.fb.group({
+      nombre: ['', Validators.required],
+      correo: ['', [Validators.required, Validators.email]],
       tipo: [TipoResiduo.PLASTICO, Validators.required],
       descripcion: ['', Validators.required],
       cantidad: ['', [Validators.required, Validators.min(0.1)]]
@@ -195,6 +62,35 @@ export class ReporteResiduoComponent {
     this.imagenPreview.set(null);
   }
 
+  async gestionarFoto() {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: 'Gestionar Foto',
+      buttons: [
+        {
+          text: 'Tomar nueva foto',
+          icon: 'camera',
+          handler: () => {
+            this.tomarFoto();
+          }
+        },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          icon: 'trash',
+          handler: () => {
+            this.eliminarFoto();
+          }
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          icon: 'close'
+        }
+      ]
+    });
+    await actionSheet.present();
+  }
+
   async actualizarUbicacion() {
     try {
       const position = await Geolocation.getCurrentPosition({
@@ -211,25 +107,55 @@ export class ReporteResiduoComponent {
   }
 
   async enviarReporte() {
-    if (!this.reporteForm.valid || !this.imagenPreview() || !this.ubicacion()) {
+    if (!this.reporteForm.valid || !this.ubicacion()) {
       return;
     }
 
-    const reporte = {
-      ...this.reporteForm.value,
-      imagen: this.imagenPreview(),
-      ubicacion: this.ubicacion(),
-      fecha: new Date().toISOString()
-    };
-
-    console.log('Enviando reporte:', reporte);
+    const { nombre, correo, tipo, descripcion, cantidad } = this.reporteForm.value;
     
-    // Aquí iría la lógica para enviar a tu API
-    // await this.apiService.enviarReporte(reporte);
+    // Concatenar cantidad y ubicación en la descripción
+    const ubicacionValue = this.ubicacion();
+    const descAmpliada = `${descripcion}\n- Cantidad aprox: ${cantidad} kg\n- Ubicación GPS: ${ubicacionValue?.latitude}, ${ubicacionValue?.longitude}`;
 
-    // Resetear formulario
-    this.reporteForm.reset();
-    this.imagenPreview.set(null);
-    this.ubicacion.set(null);
+    const formData = new FormData();
+    formData.append('nombre', nombre);
+    formData.append('correo', correo);
+    formData.append('asunto', `Reporte de Residuo: ${tipo}`);
+    formData.append('descripcion', descAmpliada);
+
+    if (this.imagenPreview()) {
+      // Enviar el base64 directamente
+      formData.append('evidencia_url', this.imagenPreview()!);
+    }
+
+    console.log('Enviando reporte...', formData);
+    
+    // Enviar a la API
+    this.http.post('http://localhost:8000/reportes', formData).subscribe({
+      next: async (res) => {
+        const toast = await this.toastCtrl.create({
+          message: 'Reporte enviado con éxito. ¡Gracias por tu colaboración!',
+          duration: 3000,
+          color: 'success',
+          position: 'top'
+        });
+        toast.present();
+
+        // Resetear formulario
+        this.reporteForm.reset({ tipo: TipoResiduo.PLASTICO });
+        this.imagenPreview.set(null);
+        this.ubicacion.set(null);
+      },
+      error: async (err) => {
+        console.error('Error enviando reporte:', err);
+        const toast = await this.toastCtrl.create({
+          message: 'Error al enviar el reporte. Inténtalo de nuevo más tarde.',
+          duration: 3000,
+          color: 'danger',
+          position: 'top'
+        });
+        toast.present();
+      }
+    });
   }
 }

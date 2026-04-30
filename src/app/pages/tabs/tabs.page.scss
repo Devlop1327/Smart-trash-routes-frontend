@@ -1,0 +1,29 @@
+ion-tab-bar {
+  --background: var(--ecox-card, #1e1e1e);
+  --border-top: 1px solid var(--ecox-border, #333);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+}
+
+ion-tab-button {
+  --color: var(--ecox-secondary, #6272a4);
+  --color-selected: var(--ecox-accent, #50fa7b);
+  --ripple-color: var(--ecox-accent, #50fa7b);
+}
+
+ion-tab-button ion-icon {
+  font-size: 24px;
+}
+
+ion-tab-button ion-label {
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* Estilo para el botón activo */
+ion-tab-button.tab-selected {
+  ion-icon,
+  ion-label {
+    color: var(--ecox-accent, #50fa7b);
+  }
+}

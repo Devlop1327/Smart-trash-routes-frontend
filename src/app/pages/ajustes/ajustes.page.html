@@ -13,7 +13,7 @@
       <ion-label>Tema Oscuro</ion-label>
       <ion-toggle 
         [checked]="isDark()" 
-        (ionChange)="toggleTheme()">
+        (click)="toggleTheme(); $event.stopPropagation()">
       </ion-toggle>
     </ion-item>
 

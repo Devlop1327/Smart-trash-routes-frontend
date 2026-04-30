@@ -1,14 +1,15 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
 import { Map, View } from 'ol';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { Feature } from 'ol';
-import { Point, LineString } from 'ol/geom';
+import { Point, LineString, MultiLineString } from 'ol/geom';
 import { Style, Icon, Stroke, Fill, Circle as CircleStyle, Text } from 'ol/style';
 import { fromLonLat, toLonLat, transformExtent } from 'ol/proj';
 import { Geolocation } from '@capacitor/geolocation';
 import { Zoom } from 'ol/control';
 import { GeoJSON } from 'ol/format';
+import { RutasService, Ruta } from './rutas.service';
 
 export enum TipoResiduo {
   PLASTICO = 'plastico',
@@ -41,16 +42,23 @@ export class MapaService {
   private mapa: Map | null = null;
   private capaRuta: VectorLayer | null = null;
   private capaCalles: VectorLayer | null = null;
+  private capaRutasAdmin: VectorLayer | null = null;
   private posicionUsuario = signal<[number, number] | null>(null);
   private puntosRecogida = signal<PuntoRecogida[]>([]);
   private rutaActual = signal<RutaUsuario | null>(null);
+  private rutasAdmin = signal<Ruta[]>([]);
+  private rutaAdminSeleccionada = signal<Ruta | null>(null);
 
   readonly posicionUsuarioSignal = this.posicionUsuario.asReadonly();
   readonly puntosRecogidaSignal = this.puntosRecogida.asReadonly();
   readonly rutaActualSignal = this.rutaActual.asReadonly();
+  readonly rutasAdminSignal = this.rutasAdmin.asReadonly();
+  readonly rutaAdminSeleccionadaSignal = this.rutaAdminSeleccionada.asReadonly();
+
+  private rutasService = inject(RutasService);
 
   constructor() {
-    this.cargarPuntosRecogida();
+    // Puntos de recogida eliminados - ahora solo mostramos rutas del admin
   }
 
   inicializarMapa(target: string): Map {
@@ -74,7 +82,7 @@ export class MapaService {
         center: fromLonLat([-77.0451, 3.8850]), // Buenaventura, Colombia
         zoom: 13,
         minZoom: 12,
-        maxZoom: 18,
+        maxZoom: 19,
         extent: extentProyectado // Restringe navegación
       })
     });
@@ -174,7 +182,6 @@ export class MapaService {
       });
 
       this.mapa.addLayer(this.capaCalles);
-      console.log(`✅ Calles de Buenaventura cargadas: ${geojson.features?.length || 0} vías`);
 
     } catch (error) {
       console.error('Error cargando calles de Buenaventura:', error);
@@ -236,85 +243,7 @@ export class MapaService {
     this.mapa.addLayer(capaUsuario);
   }
 
-  private cargarPuntosRecogida(): void {
-    const puntos: PuntoRecogida[] = [
-      {
-        id: '1',
-        nombre: 'Centro de Reciclaje - Cascajal',
-        tipo: TipoResiduo.PLASTICO,
-        coordenadas: [-77.0280, 3.8855],
-        direccion: 'Calle 1 # 5-45, Cascajal',
-        horario: 'Lun-Sáb 7:00-18:00'
-      },
-      {
-        id: '2',
-        nombre: 'Punto Verde - San Antonio',
-        tipo: TipoResiduo.VIDRIO,
-        coordenadas: [-77.0400, 3.8950],
-        direccion: 'Carrera 6 # 4-23, San Antonio',
-        horario: 'Lun-Vie 8:00-17:00'
-      },
-      {
-        id: '3',
-        nombre: 'Reciclaje Bahía - Malecón',
-        tipo: TipoResiduo.ORGANICO,
-        coordenadas: [-77.0720, 3.8930],
-        direccion: 'Avenida del Malecón # 1-10',
-        horario: 'Lun-Sáb 6:00-20:00'
-      },
-      {
-        id: '4',
-        nombre: 'Eco Punto - Juan XXIII',
-        tipo: TipoResiduo.PAPEL,
-        coordenadas: [-77.0350, 3.8800],
-        direccion: 'Calle 5 # 8-67, Juan XXIII',
-        horario: 'Lun-Vie 7:00-18:00'
-      },
-      {
-        id: '5',
-        nombre: 'Punto Limpio - Piñal',
-        tipo: TipoResiduo.ESPECIAL,
-        coordenadas: [-77.0200, 3.9100],
-        direccion: 'Carrera 10 # 12-30, El Piñal',
-        horario: 'Mar-Sáb 8:00-16:00'
-      },
-      {
-        id: '6',
-        nombre: 'Reciclaje Local - San Pedro',
-        tipo: TipoResiduo.PLASTICO,
-        coordenadas: [-77.0550, 3.8750],
-        direccion: 'Calle 8 # 4-12, San Pedro Claver',
-        horario: 'Lun-Sáb 7:00-19:00'
-      }
-    ];
-
-    this.puntosRecogida.set(puntos);
-    this.agregarMarcadoresPuntos(puntos);
-  }
-
-  private agregarMarcadoresPuntos(puntos: PuntoRecogida[]): void {
-    if (!this.mapa) return;
-
-    const features = puntos.map(punto => {
-      const feature = new Feature({
-        geometry: new Point(fromLonLat(punto.coordenadas)),
-        type: 'punto-recogida',
-        punto
-      });
-
-      const estilo = this.obtenerEstiloPorTipo(punto.tipo);
-      feature.setStyle(estilo);
-      return feature;
-    });
-
-    const capaPuntos = new VectorLayer({
-      source: new VectorSource({
-        features
-      })
-    });
-
-    this.mapa.addLayer(capaPuntos);
-  }
+  
 
   private obtenerEstiloPorTipo(tipo: TipoResiduo): Style {
     const iconos = {
@@ -409,5 +338,231 @@ export class MapaService {
       this.capaRuta = null;
     }
     this.rutaActual.set(null);
+  }
+
+  // ==================== RUTAS DEL ADMIN ====================
+  private cacheRutas: Ruta[] | null = null;
+  private lastFetchTime = 0;
+  private readonly CACHE_DURATION = 60000; // 1 minuto
+
+  /**
+   * Carga todas las rutas creadas por el admin desde el backend
+   * con cache para evitar llamadas innecesarias
+   */
+  cargarRutasAdmin(forceRefresh = false): void {
+    const now = Date.now();
+    
+    // Usar cache si está disponible y no ha expirado
+    if (!forceRefresh && this.cacheRutas && (now - this.lastFetchTime) < this.CACHE_DURATION) {
+      this.rutasAdmin.set(this.cacheRutas);
+      this.mostrarRutasAdminEnMapa(this.cacheRutas);
+      return;
+    }
+
+    const startTime = performance.now();
+    
+    this.rutasService.listarRutas().subscribe({
+      next: (rutas) => {
+        const duration = Math.round(performance.now() - startTime);
+        
+        // Guardar en cache
+        this.cacheRutas = rutas;
+        this.lastFetchTime = now;
+        
+        this.rutasAdmin.set(rutas);
+        this.mostrarRutasAdminEnMapa(rutas);
+      },
+      error: (err) => {
+        console.error('❌ Error cargando rutas:', err);
+        
+        // Si hay cache, usarla como fallback
+        if (this.cacheRutas) {
+          this.rutasAdmin.set(this.cacheRutas);
+          this.mostrarRutasAdminEnMapa(this.cacheRutas);
+        }
+      }
+    });
+  }
+
+  /**
+   * Muestra todas las rutas del admin en el mapa
+   */
+  private mostrarRutasAdminEnMapa(rutas: Ruta[]): void {
+    if (!this.mapa) return;
+
+    // Remover capa anterior si existe
+    if (this.capaRutasAdmin) {
+      this.mapa.removeLayer(this.capaRutasAdmin);
+    }
+
+    const features: Feature[] = [];
+
+    rutas.forEach(ruta => {
+      let shapeObj = ruta.shape as any;
+      if (typeof shapeObj === 'string') {
+        try { shapeObj = JSON.parse(shapeObj); } catch (e) { return; }
+      }
+
+      if (shapeObj && shapeObj.coordinates && Array.isArray(shapeObj.coordinates) && shapeObj.coordinates.length > 0) {
+        const coords = shapeObj.coordinates as any[];
+        let geometry;
+
+        if (shapeObj.type === 'MultiLineString' || (coords[0] && Array.isArray(coords[0]) && Array.isArray(coords[0][0]))) {
+          const olCoordsMulti = coords.map((line: any[]) => line.map((c: number[]) => fromLonLat(c)));
+          geometry = new MultiLineString(olCoordsMulti);
+        } else {
+          const olCoords = coords.map((c: number[]) => fromLonLat(c));
+          geometry = new LineString(olCoords);
+        }
+
+        const lineaRuta = new Feature({
+          geometry: geometry,
+          type: 'ruta-admin',
+          ruta: ruta
+        });
+
+        const color = ruta.color_hex || '#2dcecc';
+        const estilo = new Style({
+          stroke: new Stroke({ color: color, width: 5 })
+        });
+
+        lineaRuta.setStyle(estilo);
+        features.push(lineaRuta);
+      }
+    });
+
+    if (features.length > 0) {
+      this.capaRutasAdmin = new VectorLayer({
+        source: new VectorSource({
+          features
+        }),
+        properties: { name: 'rutas-admin' },
+        zIndex: 15 // Por encima de las calles
+      });
+
+      this.mapa.addLayer(this.capaRutasAdmin);
+      
+      // Ajustar vista para mostrar todas las rutas
+      const extent = this.capaRutasAdmin.getSource()?.getExtent();
+      if (extent) {
+        this.mapa.getView().fit(extent, { padding: [50, 50, 50, 50] });
+      }
+    }
+  }
+
+  /**
+   * Selecciona y resalta una ruta específica del admin
+   */
+  seleccionarRutaAdmin(ruta: Ruta): void {
+
+    if (!this.mapa || !ruta.shape) {
+      console.warn('[DEBUG] Ruta sin shape o mapa no inicializado', ruta);
+      return;
+    }
+
+    let shapeObj = ruta.shape as any;
+    if (typeof shapeObj === 'string') {
+      try {
+        shapeObj = JSON.parse(shapeObj);
+      } catch (e) {
+        console.error('[DEBUG] No se pudo parsear el shape:', shapeObj);
+        return;
+      }
+    }
+
+    if (!shapeObj || !shapeObj.coordinates || !Array.isArray(shapeObj.coordinates) || shapeObj.coordinates.length === 0) {
+      console.warn('[DEBUG] La ruta no tiene coordenadas validas o esta vacia:', shapeObj);
+      // Limpiamos la ruta de todos modos para que el UI quite la seleccion visual de la anterior
+      this.limpiarRutaAdminSeleccionada();
+      this.rutaAdminSeleccionada.set(ruta);
+      return;
+    }
+
+    // Limpiar selección anterior
+    this.limpiarRutaAdminSeleccionada();
+
+    // Ahora establecemos la nueva seleccionada
+    this.rutaAdminSeleccionada.set(ruta);
+
+    try {
+      const coords = shapeObj.coordinates as any[];
+      let geometry;
+
+      if (shapeObj.type === 'MultiLineString' || (coords[0] && Array.isArray(coords[0]) && Array.isArray(coords[0][0]))) {
+        const olCoordsMulti = coords.map((line: any[]) => line.map((c: number[]) => fromLonLat(c)));
+        geometry = new MultiLineString(olCoordsMulti);
+      } else {
+        const olCoords = coords.map((c: number[]) => fromLonLat(c));
+        geometry = new LineString(olCoords);
+      }
+
+      const lineaRuta = new Feature({
+        geometry: geometry,
+        type: 'ruta-admin-seleccionada',
+        ruta: ruta
+      });
+
+      const color = ruta.color_hex || '#2dcecc';
+      const estilo = [
+        new Style({
+          stroke: new Stroke({ color: 'rgba(255, 255, 255, 0.9)', width: 12 })
+        }),
+        new Style({
+          stroke: new Stroke({ color: color, width: 6 }),
+          text: new Text({
+            text: ruta.nombre_ruta,
+            font: 'bold 14px Inter, sans-serif',
+            fill: new Fill({ color: '#ffffff' }),
+            stroke: new Stroke({ color: '#000000', width: 4 }),
+            offsetY: -15,
+            placement: 'line'
+          })
+        })
+      ];
+
+      lineaRuta.setStyle(estilo);
+
+      this.capaRuta = new VectorLayer({
+        source: new VectorSource({ features: [lineaRuta] }),
+        properties: { name: 'ruta-admin-seleccionada' },
+        zIndex: 20
+      });
+
+      this.mapa.addLayer(this.capaRuta);
+
+      const extent = this.capaRuta.getSource()?.getExtent();
+      
+      if (extent && extent.every(v => Number.isFinite(v))) {
+        this.mapa.getView().fit(extent, { 
+          padding: [30, 30, 30, 30],
+          duration: 1000,
+          maxZoom: 17
+        });
+      } else {
+        console.error('[DEBUG] El extent calculado no es válido:', extent);
+      }
+    } catch (e) {
+      console.error('[DEBUG] ERROR CRITICO dibujando ruta seleccionada:', e);
+    }
+  }
+
+  /**
+   * Limpia la ruta admin seleccionada
+   */
+  limpiarRutaAdminSeleccionada(): void {
+    if (this.capaRuta && this.mapa) {
+      this.mapa.removeLayer(this.capaRuta);
+      this.capaRuta = null;
+    }
+    this.rutaAdminSeleccionada.set(null);
+  }
+
+  /**
+   * Alternar visibilidad de las rutas del admin
+   */
+  toggleRutasAdmin(visible: boolean): void {
+    if (this.capaRutasAdmin) {
+      this.capaRutasAdmin.setVisible(visible);
+    }
   }
 }

@@ -1,4 +1,9 @@
 /* Estilos específicos para la página de reportar */
 ion-content {
-  --background: var(--ecox-bg);
+  --background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+}
+
+:host-context(.dark) ion-content,
+:host-context([data-theme='dark']) ion-content {
+  --background: linear-gradient(135deg, #022c22 0%, #082f49 100%);
 }

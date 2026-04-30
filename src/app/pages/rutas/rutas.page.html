@@ -1,0 +1,65 @@
+<ion-content [fullscreen]="true" class="rutas-page">
+  <!-- Header -->
+  <ion-header class="ion-no-border">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/dashboard"></ion-back-button>
+      </ion-buttons>
+      <ion-title>Rutas de Recolección</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="rutas-content">
+    <!-- Loading -->
+    <div *ngIf="cargando" class="loading-container">
+      <ion-spinner color="primary"></ion-spinner>
+      <ion-text>Cargando rutas...</ion-text>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !cargando" class="error-container">
+      <ion-icon name="alert-circle" color="danger"></ion-icon>
+      <ion-text>{{ error }}</ion-text>
+      <ion-button (click)="cargarRutas()" fill="outline" size="small">
+        Reintentar
+      </ion-button>
+    </div>
+
+    <!-- Lista de rutas -->
+    <div *ngIf="!cargando && !error" class="rutas-list">
+      <ion-text class="section-title">
+        {{ rutas.length }} ruta{{ rutas.length !== 1 ? 's' : '' }} disponible{{ rutas.length !== 1 ? 's' : '' }}
+      </ion-text>
+
+      <ion-card
+        *ngFor="let ruta of rutas"
+        class="ruta-card"
+        (click)="verRutaEnMapa(ruta)">
+        <ion-card-content class="ruta-content">
+          <!-- Icono con color de la ruta -->
+          <div
+            class="ruta-icon"
+            [style.background]="getIconBackground(ruta.color_hex)">
+            <ion-icon name="navigate"></ion-icon>
+          </div>
+
+          <!-- Info de la ruta -->
+          <div class="ruta-info">
+            <ion-label class="ruta-nombre">{{ ruta.nombre_ruta }}</ion-label>
+            <ion-note class="ruta-id">ID: {{ ruta.id_ruta }}</ion-note>
+          </div>
+
+          <!-- Flecha -->
+          <ion-icon name="chevron-forward" class="ruta-arrow"></ion-icon>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Mensaje si no hay rutas -->
+      <div *ngIf="rutas.length === 0" class="empty-container">
+        <ion-icon name="map-outline" color="medium"></ion-icon>
+        <ion-text>No hay rutas disponibles</ion-text>
+        <ion-note>Las rutas aparecerán aquí cuando estén configuradas</ion-note>
+      </div>
+    </div>
+  </div>
+</ion-content>

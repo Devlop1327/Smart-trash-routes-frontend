@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-container": "#efefff",
+                    "outline-variant": "#bec9c4",
+                    "inverse-on-surface": "#eef1ef",
+                    "primary-fixed": "#9df3dc",
+                    "on-primary-fixed": "#00201a",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f7faf8",
+                    "on-background": "#181c1b",
+                    "tertiary-container": "#006a78",
+                    "surface-tint": "#006b59",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f7faf8",
+                    "on-surface-variant": "#3e4945",
+                    "secondary-fixed-dim": "#b8c3ff",
+                    "secondary-container": "#2e5bff",
+                    "on-primary": "#ffffff",
+                    "secondary": "#0040e0",
+                    "outline": "#6e7975",
+                    "surface-container-low": "#f1f4f2",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#81d6c0",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-container": "#96ebd5",
+                    "inverse-surface": "#2d3130",
+                    "inverse-primary": "#81d6c0",
+                    "secondary-fixed": "#dde1ff",
+                    "tertiary-fixed-dim": "#44d8f1",
+                    "tertiary": "#00505b",
+                    "surface-variant": "#e0e3e1",
+                    "on-tertiary-fixed-variant": "#004e59",
+                    "on-primary-fixed-variant": "#005143",
+                    "surface-dim": "#d7dbd9",
+                    "on-secondary-fixed": "#001356",
+                    "surface-container-highest": "#e0e3e1",
+                    "on-tertiary-container": "#80eaff",
+                    "on-surface": "#181c1b",
+                    "primary-container": "#006d5b",
+                    "surface-container-high": "#e6e9e7",
+                    "primary": "#005344",
+                    "on-secondary-fixed-variant": "#0035be",
+                    "on-secondary": "#ffffff",
+                    "surface-container": "#ebefed",
+                    "tertiary-fixed": "#a1efff",
+                    "background": "#f7faf8",
+                    "on-tertiary-fixed": "#001f25"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .map-gradient-overlay {
+            background: linear-gradient(to bottom, rgba(247, 250, 248, 0.9) 0%, rgba(247, 250, 248, 0) 20%, rgba(247, 250, 248, 0) 80%, rgba(247, 250, 248, 0.9) 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center w-full px-6 py-4 bg-surface/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm shadow-teal-900/5">
+<div class="flex items-center gap-3">
+<button class="active:scale-95 duration-200 text-teal-900 dark:text-teal-50">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-manrope font-bold text-xl tracking-tight text-teal-900 dark:text-teal-50">Mapa de Rutas</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="User profile avatar" data-alt="Professional headshot of a person with a clean background, soft studio lighting, corporate portrait style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEmVrP3XU6Ggnvyk_65a46uE5pMi3Wk7vnt9CD1Ggz5T2VDxgDRraJrAljHd7of17e3nFA3dfzJ4AvygmPlyutiNHBFig171SDw52g6k4yAoq-L5QaCKiwFLTA3uvi2eQTmP7ufLLY3JqbqhebwIEatx11tlC8tI2wMAxnpVS-VJ0LMFDJOd5mkaBnR3xOOGh-nSBMAlTlmCmINIUkkbfoSmHo8GdYJkdRyVkGZx2JrWNpIBf9Q6PuV02sie2IQA75LrPGPKh0B4A"/>
+</div>
+</header>
+<main class="relative h-screen w-full pt-16">
+<!-- Interactive Map Background -->
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover" data-alt="Modern topographic city map visualization with stylized color-coded transit lines in green, blue, and grey overlays" data-location="Barcelona" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpl-PhXpxWMYbPoQVpNQAmI2M94oRTJKUMWjuwmAli7XTvLV__DSmX6ic2CbXXztcPmcg4M55cGxc1NdCj19dZoq-Hh7RvwxkwwBof7jckbKru9KsLe6MfNwcT1h6jGKQfxtVFLsK99WF0VSNEqZdIqLfD3ODaG6OW-ow-sY9JHkEt507tDrW7l1yDp4q06ywyk8WrpJ3b_5UUIF3720BupkBRCZ1jpKD_ql0ss7cYaZgVnlFgnzrFDz9sa9nw9wD2YsGclHDN62A"/>
+<div class="absolute inset-0 map-gradient-overlay pointer-events-none"></div>
+</div>
+<!-- Search and Filters Layer -->
+<div class="relative z-10 px-4 pt-4 space-y-4">
+<!-- Search Bar -->
+<div class="bg-surface-container-lowest shadow-lg shadow-on-surface/5 rounded-xl px-4 py-3 flex items-center gap-3">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-on-surface font-medium placeholder:text-outline-variant" placeholder="Buscar dirección o zona..." type="text"/>
+<span class="material-symbols-outlined text-outline">my_location</span>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+<button class="flex items-center gap-2 bg-primary-container text-on-primary-container px-4 py-2 rounded-full whitespace-nowrap shadow-sm">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="font-label text-xs font-semibold uppercase tracking-wider">Orgánicos</span>
+</button>
+<button class="flex items-center gap-2 bg-secondary-container text-on-secondary-container px-4 py-2 rounded-full whitespace-nowrap shadow-sm">
+<span class="material-symbols-outlined text-sm">water_drop</span>
+<span class="font-label text-xs font-semibold uppercase tracking-wider">Plásticos</span>
+</button>
+<button class="flex items-center gap-2 bg-surface-container-highest text-on-surface-variant px-4 py-2 rounded-full whitespace-nowrap shadow-sm">
+<span class="material-symbols-outlined text-sm">delete</span>
+<span class="font-label text-xs font-semibold uppercase tracking-wider">General</span>
+</button>
+</div>
+</div>
+<!-- Floating Map Controls -->
+<div class="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2">
+<button class="w-12 h-12 bg-surface-container-lowest rounded-xl shadow-lg flex items-center justify-center text-primary active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="w-12 h-12 bg-surface-container-lowest rounded-xl shadow-lg flex items-center justify-center text-primary active:scale-95 transition-transform">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<button class="w-12 h-12 bg-surface-container-lowest rounded-xl shadow-lg flex items-center justify-center text-secondary active:scale-95 transition-transform mt-4">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">near_me</span>
+</button>
+</div>
+<!-- Selected Route Details Card -->
+<div class="absolute bottom-24 left-4 right-4 z-20">
+<div class="bg-surface-container-lowest rounded-[2rem] p-6 shadow-2xl shadow-on-surface/10 border border-outline-variant/15">
+<div class="flex justify-between items-start mb-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="w-3 h-3 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label text-[10px] font-bold text-primary uppercase tracking-[0.15em]">Ruta Activa</span>
+</div>
+<h2 class="font-headline text-2xl font-extrabold text-on-surface tracking-tight">Ruta Centro Histórico</h2>
+</div>
+<button class="bg-surface-container-low p-2 rounded-full text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="grid grid-cols-2 gap-3 mb-6">
+<div class="bg-surface-container-low rounded-2xl p-3">
+<span class="font-label text-[10px] font-semibold text-outline uppercase block mb-1">Frecuencia</span>
+<p class="font-body text-sm font-bold text-on-surface">Lunes y Jueves</p>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-3">
+<span class="font-label text-[10px] font-semibold text-outline uppercase block mb-1">Próxima recolección</span>
+<p class="font-body text-sm font-bold text-primary">Hoy, 14:30</p>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img alt="driver" data-alt="Portrait of a friendly male worker in uniform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA7LzEYIbtEFxCI7pw7OQf-AX_8QSUxKtcE8zGBdaIWqQJymUosN4-Afe0nsvatVKxmjsovI9RTad9BLFQ8DOyAFA11D2AEUWJsH6mIewoKCF_O_QFbt4l63wWMHi-dK16dRno9FrDQBoGjp7TiNToVtmQlhmWAVnvvQoqkZFPUiACgAHZqOxAkeCCH8x23gfyhgfzvGz7iz3CuibJNb8AzELoaZQ73EQEs6YFAi3Xuy86s7JzT4TK32y-rbBJIRPTHnwSy3FJYq4"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-fixed flex items-center justify-center">
+<span class="font-label text-[10px] font-bold text-on-primary-fixed">+2</span>
+</div>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-6 py-3 rounded-xl font-bold text-sm shadow-md active:translate-y-1 transition-all">
+                        Ver Detalles Completos
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pt-3 pb-6 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md shadow-[0_-8px_24px_rgba(24,28,27,0.06)] rounded-t-[2rem]">
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-teal-600 dark:hover:text-teal-300 active:translate-y-1 transition-all">
+<span class="material-symbols-outlined">home</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider mt-1">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-teal-100/50 dark:bg-teal-900/40 text-teal-900 dark:text-teal-100 rounded-2xl px-5 py-2 active:translate-y-1 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider mt-1">Routes</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-teal-600 dark:hover:text-teal-300 active:translate-y-1 transition-all">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider mt-1">Schedule</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-teal-600 dark:hover:text-teal-300 active:translate-y-1 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider mt-1">Alerts</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-teal-600 dark:hover:text-teal-300 active:translate-y-1 transition-all">
+<span class="material-symbols-outlined">person</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider mt-1">Profile</span>
+</div>
+</nav>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

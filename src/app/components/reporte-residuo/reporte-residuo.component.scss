@@ -1,0 +1,317 @@
+.premium-container {
+  padding: 0 20px 40px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+  
+  h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--ion-text-color);
+    margin: 0 0 8px;
+    line-height: 1.2;
+  }
+  
+  p {
+    font-size: 15px;
+    color: var(--ion-color-step-500);
+    margin: 0;
+  }
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+:host-context(.dark) .glass-card,
+:host-context([data-theme='dark']) .glass-card {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  
+  .icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    
+    ion-icon {
+      font-size: 20px;
+      color: white;
+    }
+    
+    &.color-primary { background: linear-gradient(135deg, #059669, #047857); box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); }
+    &.color-secondary { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+    &.color-tertiary { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
+  }
+  
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--ion-text-color);
+  }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.premium-input {
+  --background: rgba(255, 255, 255, 0.5);
+  --border-radius: 16px;
+  --padding-start: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  
+  &.item-has-focus {
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+  }
+  
+  ion-icon {
+    color: #059669;
+    margin-right: 12px;
+  }
+}
+
+:host-context(.dark) .premium-input,
+:host-context([data-theme='dark']) .premium-input {
+  --background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+// Photo Upload
+.photo-dropzone {
+  border: 2px dashed rgba(5, 150, 105, 0.3);
+  border-radius: 20px;
+  background: rgba(5, 150, 105, 0.02);
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:active {
+    transform: scale(0.98);
+    background: rgba(5, 150, 105, 0.05);
+  }
+  
+  .dropzone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    ion-icon {
+      font-size: 48px;
+      color: #059669;
+      margin-bottom: 12px;
+    }
+    
+    .title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ion-text-color);
+      margin-bottom: 4px;
+    }
+    
+    .subtitle {
+      font-size: 13px;
+      color: var(--ion-color-step-500);
+    }
+  }
+}
+
+.photo-preview {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  
+  img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover img {
+    transform: scale(1.05);
+  }
+  
+  .photo-overlay-edit {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    
+    ion-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    
+    span {
+      font-size: 15px;
+      font-weight: 600;
+    }
+  }
+  
+  &:active .photo-overlay-edit, &:hover .photo-overlay-edit {
+    opacity: 1;
+  }
+}
+
+.zoom-in {
+  animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+// Location
+.btn-location-action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  
+  ion-icon {
+    font-size: 20px;
+  }
+  
+  &:active {
+    background: rgba(245, 158, 11, 0.2);
+    transform: scale(0.98);
+  }
+}
+
+.location-success {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  border-radius: 16px;
+  
+  .map-icon-bg {
+    width: 48px;
+    height: 48px;
+    background: rgba(245, 158, 11, 0.15);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    
+    ion-icon {
+      font-size: 24px;
+      color: #d97706;
+    }
+  }
+  
+  .coords {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    
+    .title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ion-text-color);
+    }
+    
+    .subtitle {
+      font-size: 13px;
+      color: var(--ion-color-step-500);
+      margin-top: 2px;
+    }
+  }
+  
+  .btn-refresh {
+    --color: #d97706;
+    margin: 0;
+  }
+}
+
+// Submit Button
+.action-footer {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.btn-submit-premium {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #059669, #047857);
+  color: white;
+  border: none;
+  padding: 0 24px;
+  height: 60px;
+  border-radius: 20px;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 10px 25px rgba(5, 150, 105, 0.4);
+  transition: all 0.3s ease;
+  
+  ion-icon {
+    font-size: 24px;
+  }
+  
+  &:active:not(.disabled) {
+    transform: scale(0.97);
+    box-shadow: 0 5px 15px rgba(5, 150, 105, 0.3);
+  }
+  
+  &.disabled {
+    background: var(--ion-color-step-200);
+    box-shadow: none;
+    color: var(--ion-color-step-500);
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+.helper-text {
+  font-size: 13px;
+  color: var(--ion-color-step-500);
+  margin-top: 16px;
+}

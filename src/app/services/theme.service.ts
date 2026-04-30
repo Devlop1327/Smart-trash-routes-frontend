@@ -6,7 +6,7 @@ import { Preferences } from '@capacitor/preferences';
 })
 export class ThemeService {
   private readonly THEME_KEY = 'app-theme';
-  private isDarkSignal = signal<boolean>(true);
+  private isDarkSignal = signal<boolean>(false);
 
   readonly isDark = this.isDarkSignal.asReadonly();
 
@@ -17,11 +17,11 @@ export class ThemeService {
   async loadTheme(): Promise<void> {
     try {
       const { value } = await Preferences.get({ key: this.THEME_KEY });
-      const isDark = value === null ? true : value === 'true';
+      const isDark = value === null ? false : value === 'true';
       this.setTheme(isDark);
     } catch (error) {
       console.error('Error cargando tema:', error);
-      this.setTheme(true);
+      this.setTheme(false);
     }
   }
 
