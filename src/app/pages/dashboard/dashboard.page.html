@@ -6,6 +6,14 @@
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
       <ion-title>Smart Trash Routes</ion-title>
+      <ion-buttons slot="end">
+        <ion-button class="btn-notifications" (click)="abrirNotificaciones()">
+          <ion-icon name="notifications-sharp"></ion-icon>
+          <ion-badge class="notif-badge" *ngIf="notificationsService.unreadCount() > 0">
+            {{ notificationsService.unreadCount() }}
+          </ion-badge>
+        </ion-button>
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
@@ -13,7 +21,6 @@
     <!-- Saludo personalizado -->
     <ion-text class="welcome-section">
       <p class="welcome-subtitle">
-        {{ rutas().length > 0 ? rutas().length + ' rutas disponibles' : 'Cargando rutas...' }}
       </p>
     </ion-text>
 
@@ -44,10 +51,58 @@
       </ion-card>
     </div>
 
-    <!-- Estado de mi recolección - Datos dinámicos -->
-    <div class="my-collection-section" *ngIf="rutaEnProgreso() as ruta">
-      <ion-text class="section-title">Estado de tu Recolección</ion-text>
-      <ion-card class="collection-status-card active">
+    <!-- Calendario de recolección - Generado dinámicamente -->
+    <div class="calendar-section expanded">
+      <ion-text class="section-title">Calendario Semanal</ion-text>
+      <ion-grid class="week-calendar-grid">
+        <ion-row>
+          <ion-col
+            size="4"
+            *ngFor="let dia of diasSemana"
+            class="calendar-col">
+            <div 
+              class="day-item"
+              [class.today]="dia.esHoy"
+              [class.weekend]="dia.esFinDeSemana"
+              [class.selected]="dia.seleccionado"
+              (click)="seleccionarDia(dia)">
+              <ion-text class="day-name">{{ dia.nombre }}</ion-text>
+              <ion-text class="day-date">{{ dia.fecha }}</ion-text>
+              <ion-badge
+                *ngIf="dia.estado !== 'no-service' && dia.estado !== 'pending'"
+                class="day-status"
+                [class.collected]="dia.estado === 'collected'"
+                [class.scheduled]="dia.estado === 'scheduled'"
+                [color]="dia.estado === 'collected' ? 'success' : 'medium'">
+                <ion-icon [name]="dia.estado === 'collected' ? 'checkmark' : 'time'"></ion-icon>
+              </ion-badge>
+              <div *ngIf="dia.estado === 'pending'" class="day-status pending">
+                <span class="day-dot"></span>
+              </div>
+              <div *ngIf="dia.estado === 'no-service'" class="day-status no-service">
+                <span>-</span>
+              </div>
+              
+              <!-- Indicador de nota (Tarjetita) -->
+              <div class="note-card-mini" *ngIf="dia.nota">
+                <div class="card-line"></div>
+                <span class="note-text-mini">{{ dia.nota }}</span>
+              </div>
+            </div>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+
+    <div class="my-collection-section expanded-v4" *ngIf="rutaEnProgreso() as ruta">
+      <div class="section-header-flex">
+        <ion-text class="section-title">Estado de tu Recolección</ion-text>
+        <ion-button fill="clear" size="small" class="btn-change-route" (click)="seleccionarRuta()">
+          <ion-icon name="swap-horizontal-outline" slot="start"></ion-icon>
+          Cambiar Ruta
+        </ion-button>
+      </div>
+      <ion-card class="collection-status-card active clickable-card" [routerLink]="['/mapa']">
         <ion-card-header class="status-header">
           <ion-chip class="status-badge" color="success">
             <span class="pulse"></span>
@@ -71,39 +126,6 @@
           </ion-badge>
         </ion-card-content>
       </ion-card>
-    </div>
-
-    <!-- Calendario de recolección - Generado dinámicamente -->
-    <div class="calendar-section">
-      <ion-text class="section-title">Calendario Semanal</ion-text>
-      <ion-grid class="week-calendar">
-        <ion-row>
-          <ion-col
-            *ngFor="let dia of diasSemana"
-            class="day-item"
-            [class.today]="dia.esHoy"
-            [class.weekend]="dia.esFinDeSemana"
-            [class.selected]="dia.seleccionado"
-            (click)="seleccionarDia(dia)">
-            <ion-text class="day-name">{{ dia.nombre }}</ion-text>
-            <ion-text class="day-date">{{ dia.fecha }}</ion-text>
-            <ion-badge
-              *ngIf="dia.estado !== 'no-service' && dia.estado !== 'pending'"
-              class="day-status"
-              [class.collected]="dia.estado === 'collected'"
-              [class.scheduled]="dia.estado === 'scheduled'"
-              [color]="dia.estado === 'collected' ? 'success' : 'medium'">
-              <ion-icon [name]="dia.estado === 'collected' ? 'checkmark' : 'time'"></ion-icon>
-            </ion-badge>
-            <div *ngIf="dia.estado === 'pending'" class="day-status pending">
-              <span class="day-dot"></span>
-            </div>
-            <div *ngIf="dia.estado === 'no-service'" class="day-status no-service">
-              <span>-</span>
-            </div>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
     </div>
   </div>
 </ion-content>

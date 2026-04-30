@@ -1,8 +1,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, AlertController } from '@ionic/angular';
+import { IonicModule, AlertController, ActionSheetController, ModalController } from '@ionic/angular';
 import { RouterLink } from '@angular/router';
 import { RutasService, Ruta } from '../../services/rutas.service';
+import { NotificationsService } from '../../services/notifications.service';
+import { NotificationCenterComponent } from '../../components/notification-center/notification-center.component';
 import { HttpClientModule } from '@angular/common/http';
 
 interface EstadoRecoleccion {
@@ -20,6 +22,7 @@ interface DiaCalendario {
   esHoy: boolean;
   esFinDeSemana: boolean;
   seleccionado?: boolean;
+  nota?: string;
 }
 
 @Component({
@@ -32,6 +35,9 @@ interface DiaCalendario {
 export class DashboardPage implements OnInit {
   private rutasService = inject(RutasService);
   private alertController = inject(AlertController);
+  private actionSheetController = inject(ActionSheetController);
+  private modalController = inject(ModalController);
+  public notificationsService = inject(NotificationsService);
 
   // Signals para datos reactivos
   rutas = signal<Ruta[]>([]);
@@ -44,6 +50,16 @@ export class DashboardPage implements OnInit {
   ngOnInit() {
     this.cargarDatos();
     this.generarCalendario();
+    this.cargarNotas();
+    
+    // Notificación de bienvenida si no hay ninguna
+    if (this.notificationsService.unreadCount() === 0) {
+      this.notificationsService.addNotification(
+        '¡Bienvenido!',
+        'Gracias por usar Smart Trash Routes. Aquí recibirás avisos sobre tu servicio.',
+        'info'
+      );
+    }
   }
 
   cargarDatos() {
@@ -122,6 +138,29 @@ export class DashboardPage implements OnInit {
     this.diasSemana = dias;
   }
 
+  private guardarNotas() {
+    const notas: {[key: string]: string} = {};
+    this.diasSemana.forEach(dia => {
+      if (dia.nota) {
+        notas[`${dia.nombre}-${dia.fecha}`] = dia.nota;
+      }
+    });
+    localStorage.setItem('smart_trash_notas', JSON.stringify(notas));
+  }
+
+  private cargarNotas() {
+    const notasStr = localStorage.getItem('smart_trash_notas');
+    if (notasStr) {
+      const notas = JSON.parse(notasStr);
+      this.diasSemana.forEach(dia => {
+        const key = `${dia.nombre}-${dia.fecha}`;
+        if (notas[key]) {
+          dia.nota = notas[key];
+        }
+      });
+    }
+  }
+
   // Helper para obtener el color de fondo del ícono
   getIconBackground(colorHex: string | undefined): string {
     return colorHex || '#006d5b';
@@ -131,21 +170,82 @@ export class DashboardPage implements OnInit {
     this.diasSemana.forEach(d => d.seleccionado = false);
     dia.seleccionado = true;
 
-    let mensaje = '';
+    let estadoMensaje = '';
     switch(dia.estado) {
-      case 'collected': mensaje = 'La recolección ya se realizó este día.'; break;
-      case 'pending': mensaje = 'La recolección está programada para hoy.'; break;
-      case 'scheduled': mensaje = 'Recolección programada para este día.'; break;
-      case 'no-service': mensaje = 'No hay servicio programado para este día.'; break;
+      case 'collected': estadoMensaje = 'La recolección ya se realizó este día.'; break;
+      case 'pending': estadoMensaje = 'La recolección está programada para hoy.'; break;
+      case 'scheduled': estadoMensaje = 'Recolección programada para este día.'; break;
+      case 'no-service': estadoMensaje = 'No hay servicio programado para este día.'; break;
     }
 
     const alert = await this.alertController.create({
       header: `Día ${dia.nombre} ${dia.fecha}`,
-      message: mensaje,
-      buttons: ['OK'],
+      subHeader: estadoMensaje,
+      inputs: [
+        {
+          name: 'nota',
+          type: 'textarea',
+          placeholder: 'Escribe una nota aquí...',
+          value: dia.nota || ''
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Guardar',
+          handler: (data) => {
+            dia.nota = data.nota;
+            this.guardarNotas();
+          }
+        }
+      ],
       cssClass: 'modern-alert'
     });
 
     await alert.present();
+  }
+
+  async seleccionarRuta() {
+    const rutasDisponibles = this.rutas();
+    if (rutasDisponibles.length === 0) return;
+
+    const buttons = rutasDisponibles.map(ruta => ({
+      text: ruta.nombre_ruta,
+      handler: () => {
+        this.simularRutaEnProgreso(ruta);
+        this.notificationsService.addNotification(
+          'Ruta Seleccionada',
+          `Ahora estás siguiendo la ruta: ${ruta.nombre_ruta}`,
+          'success'
+        );
+      }
+    }));
+
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Selecciona una Ruta',
+      buttons: [
+        ...buttons,
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        }
+      ]
+    });
+
+    await actionSheet.present();
+  }
+
+  async abrirNotificaciones() {
+    const modal = await this.modalController.create({
+      component: NotificationCenterComponent,
+      cssClass: 'premium-modal',
+      initialBreakpoint: 0.9,
+      breakpoints: [0, 0.5, 0.9],
+      handle: true
+    });
+    return await modal.present();
   }
 }

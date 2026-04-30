@@ -12,7 +12,8 @@ import {
   IonItem,
   IonLabel,
   IonIcon,
-  IonToggle
+  IonToggle,
+  MenuController
 } from '@ionic/angular/standalone';
 import { ThemeService } from './services/theme.service';
 
@@ -37,5 +38,14 @@ import { ThemeService } from './services/theme.service';
 })
 export class AppComponent {
   themeService = inject(ThemeService);
-  constructor() {}
+  private menuCtrl = inject(MenuController);
+
+  constructor() {
+    this.initializeApp();
+  }
+
+  initializeApp() {
+    // Asegurar que el menú esté habilitado para gestos
+    this.menuCtrl.enable(true, 'main-menu');
+  }
 }
