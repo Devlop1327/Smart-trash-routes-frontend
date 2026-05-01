@@ -1,5 +1,18 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { 
+  personCircle, 
+  homeOutline, 
+  mapOutline, 
+  alertCircleOutline, 
+  settingsOutline, 
+  moon, 
+  sunny,
+  closeOutline,
+  person
+} from 'ionicons/icons';
 import {
   IonApp,
   IonRouterOutlet,
@@ -20,8 +33,13 @@ import { ThemeService } from './services/theme.service';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
+  standalone: true,
+  encapsulation: ViewEncapsulation.None,
   imports: [
+    CommonModule,
     RouterLink,
+    RouterLinkActive,
     IonApp,
     IonRouterOutlet,
     IonMenu,
@@ -29,11 +47,7 @@ import { ThemeService } from './services/theme.service';
     IonToolbar,
     IonTitle,
     IonContent,
-    IonList,
-    IonItem,
-    IonLabel,
-    IonIcon,
-    IonToggle
+    IonIcon
   ],
 })
 export class AppComponent {
@@ -41,6 +55,17 @@ export class AppComponent {
   private menuCtrl = inject(MenuController);
 
   constructor() {
+    addIcons({
+      personCircle,
+      homeOutline,
+      mapOutline,
+      alertCircleOutline,
+      settingsOutline,
+      moon,
+      sunny,
+      closeOutline,
+      person
+    });
     this.initializeApp();
   }
 

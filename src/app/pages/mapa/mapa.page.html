@@ -1,14 +1,139 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-    </ion-buttons>
-    <ion-title>Mapa de Rutas</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="modern-map-wrapper h-screen w-screen relative font-body text-on-surface antialiased overflow-hidden">
+  
+  <!-- Map Layer -->
+  <div class="absolute inset-0 z-0">
+    <app-mapa-navigator></app-mapa-navigator>
+    <div class="absolute inset-0 bg-map-overlay pointer-events-none"></div>
+  </div>
 
-<ion-content [fullscreen]="true">
-  <app-mapa-navigator></app-mapa-navigator>
-</ion-content>
+  <!-- Header Overlay -->
+  <header class="fixed top-0 w-full z-50 glass-panel flex justify-between items-center px-6 py-4">
+    <div class="flex items-center gap-4">
+      <button (click)="toggleSelectorRutas()" class="active:scale-95 duration-200 hover:bg-emerald-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors pointer-events-auto">
+        <span class="material-symbols-outlined text-emerald-900 dark:text-emerald-500">menu</span>
+      </button>
+      <h1 class="font-headline font-bold text-lg tracking-tight text-emerald-900 dark:text-emerald-500">Gestión de Residuos</h1>
+    </div>
+  </header>
+
+  <!-- Search Overlay Section removed -->
+
+  <!-- Floating Info Card (Bottom) -->
+  @if (rutaSeleccionada() && !mostrarSelectorRutas()) {
+    <div class="fixed bottom-6 left-4 right-4 z-40 pointer-events-auto">
+      <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-outline-variant/10 relative">
+        <!-- Close Button for Card -->
+        <button (click)="seleccionarRuta(null)" class="absolute top-3 right-3 p-1.5 bg-emerald-50/50 hover:bg-emerald-100 rounded-full text-emerald-900 transition-colors shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">close</span>
+        </button>
+
+        <div class="flex items-center gap-3 mb-3 pr-8">
+          <div class="bg-primary/10 p-2 rounded-xl">
+            <span class="material-symbols-outlined text-primary text-[20px]">route</span>
+          </div>
+          <div class="min-w-0">
+            <span class="text-primary font-bold text-[9px] uppercase tracking-wider block leading-none mb-1">Ruta Seleccionada</span>
+            <h2 class="font-headline font-extrabold text-base text-on-surface tracking-tight truncate">{{ rutaSeleccionada()?.nombre_ruta }}</h2>
+          </div>
+          <div class="ml-auto bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+            <span class="material-symbols-outlined text-emerald-900 text-[10px]" style="font-variation-settings: 'FILL' 1;">bolt</span>
+            <span class="text-emerald-900 font-bold text-[9px] uppercase">Activa</span>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-2 mb-4">
+          <div class="bg-emerald-50/30 rounded-xl p-2 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[16px] opacity-60">badge</span>
+            <div class="min-w-0">
+              <p class="text-[8px] text-on-surface-variant font-semibold uppercase opacity-50">ID</p>
+              <p class="font-bold text-on-surface text-[10px] truncate">{{ (rutaSeleccionada()?.id_ruta || '').split('-')[0] }}...</p>
+            </div>
+          </div>
+          <div class="bg-emerald-50/30 rounded-xl p-2 flex items-center gap-2">
+            <span class="material-symbols-outlined text-emerald-700 text-[16px] opacity-60">calendar_today</span>
+            <div>
+              <p class="text-[8px] text-on-surface-variant font-semibold uppercase opacity-50">Fecha</p>
+              <p class="font-bold text-on-surface text-[10px]">{{ rutaSeleccionada()?.created_at | date:'dd/MM' }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <button class="w-full py-3 btn-primary-gradient text-on-primary rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-[0.98] transition-transform">
+          <span class="material-symbols-outlined text-[16px]">notifications_active</span> 
+          Notificarme al llegar
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Route Selector Panel Overlay -->
+  @if (mostrarSelectorRutas()) {
+    <div class="fixed inset-0 z-[60] flex items-center justify-center px-6 py-10 pointer-events-none">
+      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto" (click)="toggleSelectorRutas()"></div>
+      <div class="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-outline-variant/10 pointer-events-auto animate-fade-in-up relative flex flex-col max-h-full">
+        <div class="flex justify-between items-center mb-4 flex-shrink-0">
+          <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary">route</span>
+            </div>
+            <h3 class="font-headline font-bold text-xl text-on-surface">Rutas de Recolección</h3>
+          </div>
+          <button (click)="toggleSelectorRutas()" class="p-2 hover:bg-emerald-50 rounded-full text-on-surface-variant transition-colors">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Buscador de Rutas -->
+        <div class="relative mb-6 flex-shrink-0">
+          <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+            <span class="material-symbols-outlined text-on-surface-variant opacity-40">search</span>
+          </div>
+          <input type="text" 
+                 [ngModel]="searchTerm()" 
+                 (ngModelChange)="searchTerm.set($event)"
+                 placeholder="Buscar rutas o sectores..." 
+                 class="w-full bg-slate-50 border border-outline-variant/10 rounded-2xl py-4 pl-12 pr-4 text-sm font-semibold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+        </div>
+
+        <div class="space-y-2 overflow-y-auto pr-2 custom-scrollbar flex-grow">
+          <!-- Lista de Rutas Filtradas -->
+          @for (ruta of rutasFiltradas(); track ruta.id_ruta) {
+            <div (click)="seleccionarRuta(ruta); toggleSelectorRutas()"
+                 class="flex items-center gap-4 p-4 rounded-2xl border border-transparent hover:bg-emerald-50 transition-all cursor-pointer group"
+                 [class.bg-emerald-50]="rutaSeleccionada()?.id_ruta === ruta.id_ruta"
+                 [class.border-emerald-100]="rutaSeleccionada()?.id_ruta === ruta.id_ruta">
+              <div class="w-4 h-4 rounded-full shadow-sm flex-shrink-0" [style.background-color]="ruta.color_hex || '#2dcecc'"></div>
+              <div class="flex flex-col min-w-0">
+                <span class="font-bold text-on-surface group-hover:text-primary transition-colors truncate">{{ ruta.nombre_ruta }}</span>
+                <span class="text-[10px] text-on-surface-variant opacity-60 uppercase font-semibold">Sector {{ ruta.nombre_ruta.split(' ')[1] || 'General' }}</span>
+              </div>
+              <div class="ml-auto flex items-center gap-2 flex-shrink-0">
+                @if (rutaSeleccionada()?.id_ruta === ruta.id_ruta) {
+                  <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                }
+                <span class="material-symbols-outlined text-on-surface-variant opacity-20 group-hover:opacity-100 transition-opacity text-[18px]">chevron_right</span>
+              </div>
+            </div>
+          } @empty {
+            <!-- Mensaje cuando no hay resultados -->
+            <div class="flex flex-col items-center justify-center py-10 text-center animate-fade-in">
+              <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-on-surface-variant opacity-20 text-3xl">search_off</span>
+              </div>
+              <p class="font-bold text-on-surface-variant">No existen rutas con tu búsqueda</p>
+              <p class="text-xs text-on-surface-variant opacity-60 mt-1">Intenta con otro nombre o sector</p>
+            </div>
+          }
+        </div>
+        
+        <div class="mt-6 pt-4 border-t border-outline-variant/10 flex-shrink-0">
+          <button (click)="seleccionarRuta(null); toggleSelectorRutas()" 
+                  class="w-full py-3 text-on-surface-variant font-bold text-sm hover:text-error transition-colors flex items-center justify-center gap-2 bg-slate-50 rounded-2xl">
+            <span class="material-symbols-outlined text-[18px]">layers_clear</span>
+            Limpiar selección
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

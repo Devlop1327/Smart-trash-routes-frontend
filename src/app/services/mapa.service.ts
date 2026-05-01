@@ -89,6 +89,11 @@ export class MapaService {
 
     this.obtenerPosicionActual();
     this.cargarCallesBuenaventura();
+    
+    setTimeout(() => {
+      this.mapa?.updateSize();
+    }, 200);
+
     return this.mapa;
   }
 
@@ -453,10 +458,16 @@ export class MapaService {
   /**
    * Selecciona y resalta una ruta específica del admin
    */
-  seleccionarRutaAdmin(ruta: Ruta): void {
+  seleccionarRutaAdmin(ruta: Ruta | null): void {
+    if (!this.mapa) return;
 
-    if (!this.mapa || !ruta.shape) {
-      console.warn('[DEBUG] Ruta sin shape o mapa no inicializado', ruta);
+    if (!ruta) {
+      this.limpiarRutaAdminSeleccionada();
+      return;
+    }
+
+    if (!ruta.shape) {
+      console.warn('[DEBUG] Ruta sin shape', ruta);
       return;
     }
 

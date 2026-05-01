@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mapa del Ciudadano - Gestión de Residuos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f1f4f2",
+                        "primary-fixed-dim": "#81d6c0",
+                        "on-surface": "#181c1b",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed-variant": "#005143",
+                        "primary": "#005344",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#3e4945",
+                        "surface-container": "#ebefed",
+                        "inverse-on-surface": "#eef1ef",
+                        "on-background": "#181c1b",
+                        "on-tertiary-fixed": "#001f25",
+                        "tertiary-container": "#006a78",
+                        "on-tertiary-container": "#80eaff",
+                        "surface-dim": "#d7dbd9",
+                        "secondary-container": "#2e5bff",
+                        "on-secondary-fixed-variant": "#0035be",
+                        "error-container": "#ffdad6",
+                        "secondary": "#0040e0",
+                        "surface": "#f7faf8",
+                        "primary-container": "#006d5b",
+                        "tertiary-fixed-dim": "#44d8f1",
+                        "inverse-surface": "#2d3130",
+                        "tertiary": "#00505b",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004e59",
+                        "surface-bright": "#f7faf8",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#dde1ff",
+                        "surface-variant": "#e0e3e1",
+                        "surface-container-high": "#e6e9e7",
+                        "surface-tint": "#006b59",
+                        "primary-fixed": "#9df3dc",
+                        "on-secondary-fixed": "#001356",
+                        "on-error-container": "#93000a",
+                        "outline-variant": "#bec9c4",
+                        "surface-container-highest": "#e0e3e1",
+                        "on-primary-container": "#96ebd5",
+                        "background": "#f7faf8",
+                        "outline": "#6e7975",
+                        "secondary-fixed-dim": "#b8c3ff",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#81d6c0",
+                        "on-secondary-container": "#efefff",
+                        "on-primary-fixed": "#00201a",
+                        "tertiary-fixed": "#a1efff",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "3xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-map-overlay {
+            background-image: linear-gradient(to bottom, rgba(247, 250, 248, 0.9) 0%, rgba(247, 250, 248, 0) 15%, rgba(247, 250, 248, 0) 70%, rgba(247, 250, 248, 0.9) 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-hidden h-screen flex flex-col">
+<!-- TopAppBar Execution -->
+<header class="fixed top-0 w-full z-50 bg-emerald-50/80 dark:bg-slate-950/80 backdrop-blur-xl flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 duration-200 hover:bg-emerald-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined text-emerald-900 dark:text-emerald-500">menu</span>
+</button>
+<h1 class="font-manrope font-bold text-lg tracking-tight text-emerald-900 dark:text-emerald-500">Gestión de Residuos</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="active:scale-95 duration-200 hover:bg-emerald-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined text-emerald-900 dark:text-emerald-500">notifications</span>
+</button>
+</div>
+</header>
+<!-- Search Overlay Section -->
+<div class="fixed top-20 left-0 right-0 z-40 px-6">
+<div class="relative w-full max-w-md mx-auto">
+<div class="bg-surface-container-lowest/90 backdrop-blur-md rounded-3xl p-1 flex items-center shadow-lg shadow-on-surface/5 border border-outline-variant/10">
+<div class="pl-4 pr-2">
+<span class="material-symbols-outlined text-primary">search</span>
+</div>
+<input class="w-full bg-transparent border-none focus:ring-0 text-sm py-3 text-on-surface placeholder:text-outline font-medium" placeholder="Buscar dirección o zona..." type="text"/>
+<div class="pr-2">
+<button class="bg-primary text-on-primary p-2 rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Map Canvas -->
+<main class="relative flex-grow w-full">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover grayscale-[0.2] contrast-[0.9]" data-alt="Modern clean map view of a city with light green park areas and teal water features, featuring a stylized logistic route line" data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU7B5TKDJTg6yLlOv6d8rqETilDYsHSL3PMjHzAEwrpydaalox9Rc9mRR1GowCjc_eM1g_qdZl0l9Y3bJC8mV15T95RpGxpOZVs_kRPphncYvYlr-wlNtrCD5mTeER99ubyfiHMFLN0A2aX3-VE568kqD_jLJaMDiaa11RcRP1RU8XlfuNxkP_zYOZ-JdzVHNHvMlUNaIIws8oUqm0tn2h_o--a7g23CCtSY7GTQimgq2tt_CMBHZO_V31iJ0b_mfMpx6DsIOS67g"/>
+<div class="absolute inset-0 bg-map-overlay pointer-events-none"></div>
+</div>
+<!-- Interactive Map Elements (Layered) -->
+<div class="absolute inset-0 z-10">
+<!-- User Location Pulse -->
+<div class="absolute top-[45%] left-[55%]">
+<div class="relative flex items-center justify-center">
+<div class="absolute h-8 w-8 bg-secondary/20 rounded-full animate-ping"></div>
+<div class="h-4 w-4 bg-secondary border-2 border-surface-container-lowest rounded-full shadow-lg"></div>
+</div>
+</div>
+<!-- Logistics Route Line (SVG Overlay) -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M 20 80 Q 40 75 50 50 T 80 20" fill="none" stroke="#005344" stroke-dasharray="2,2" stroke-linecap="round" stroke-width="0.8"></path>
+</svg>
+<!-- Garbage Truck Tracker -->
+<div class="absolute top-[20%] left-[80%] transition-all duration-1000">
+<div class="bg-primary text-on-primary p-2 rounded-2xl shadow-xl flex items-center justify-center border-2 border-primary-fixed">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+</div>
+<!-- Status Tooltip -->
+<div class="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap bg-on-surface text-surface text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-widest shadow-sm">
+                    Truck ID: W-204
+                </div>
+</div>
+<!-- Sector Area Overlay -->
+<div class="absolute top-[60%] left-[10%] w-32 h-32 bg-primary/5 border-2 border-primary/20 rounded-[40px] flex items-center justify-center">
+<span class="text-primary/40 font-black text-xs tracking-widest uppercase">Sector B</span>
+</div>
+</div>
+<!-- Map Controls (Side) -->
+<div class="absolute right-6 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3">
+<button class="w-12 h-12 bg-surface-container-lowest shadow-lg rounded-2xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">my_location</span>
+</button>
+<button class="w-12 h-12 bg-surface-container-lowest shadow-lg rounded-2xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">layers</span>
+</button>
+<button class="w-12 h-12 bg-primary text-on-primary shadow-lg rounded-2xl flex items-center justify-center hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined">eco</span>
+</button>
+</div>
+<!-- Floating Info Card (Bottom) -->
+<div class="absolute bottom-28 left-6 right-6 z-40">
+<div class="bg-surface-container-lowest/95 backdrop-blur-xl rounded-3xl p-6 shadow-2xl shadow-on-surface/10 border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="text-primary font-bold text-xs uppercase tracking-widest block mb-1">Próxima Recolección</span>
+<h2 class="font-headline font-extrabold text-2xl text-on-surface tracking-tight">A 12 min</h2>
+</div>
+<div class="bg-primary-fixed px-3 py-1 rounded-full flex items-center gap-1.5">
+<span class="material-symbols-outlined text-on-primary-fixed text-sm" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span class="text-on-primary-fixed font-bold text-xs uppercase">En Movimiento</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-6">
+<div class="bg-surface-container-low rounded-2xl p-3 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">badge</span>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant font-semibold uppercase opacity-60">ID del Camión</p>
+<p class="font-bold text-on-surface">WMS-204</p>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-2xl p-3 flex items-center gap-3">
+<div class="w-10 h-10 bg-tertiary/10 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">location_on</span>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant font-semibold uppercase opacity-60">Estado</p>
+<p class="font-bold text-on-surface">Sector B</p>
+</div>
+</div>
+</div>
+<button class="w-full py-4 bg-gradient-to-r from-primary to-primary-container text-on-primary rounded-2xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-[0.98] transition-transform"><span class="material-symbols-outlined text-[18px]">notifications_active</span> Notificarme al llegar</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Execution -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl flex justify-around items-center px-4 pb-6 pt-2 rounded-t-[24px] shadow-[0_-8px_24px_rgba(24,28,27,0.06)]">
+<div class="flex flex-col items-center justify-center bg-emerald-100 dark:bg-emerald-900/40 text-emerald-900 dark:text-emerald-300 rounded-[20px] px-5 py-2 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider mt-1">Rutas</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-emerald-700 active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider mt-1">Horarios</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-emerald-700 active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined">eco</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider mt-1">Impacto</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 px-5 py-2 hover:text-emerald-700 active:scale-90 transition-all duration-150">
+<span class="material-symbols-outlined">person</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider mt-1">Perfil</span>
+</div>
+</nav>
+</body></html>

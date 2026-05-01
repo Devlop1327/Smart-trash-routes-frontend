@@ -1,0 +1,84 @@
+:root {
+  // Stitch Modern Color Palette
+  --sm-surface-container-low: #f1f4f2;
+  --sm-primary-fixed-dim: #81d6c0;
+  --sm-on-surface: #181c1b;
+  --sm-error: #ba1a1a;
+  --sm-on-primary-fixed-variant: #005143;
+  --sm-primary: #005344;
+  --sm-on-tertiary: #ffffff;
+  --sm-on-surface-variant: #3e4945;
+  --sm-surface-container: #ebefed;
+  --sm-inverse-on-surface: #eef1ef;
+  --sm-on-background: #181c1b;
+  --sm-on-tertiary-fixed: #001f25;
+  --sm-tertiary-container: #006a78;
+  --sm-on-tertiary-container: #80eaff;
+  --sm-surface-dim: #d7dbd9;
+  --sm-secondary-container: #2e5bff;
+  --sm-on-secondary-fixed-variant: #0035be;
+  --sm-error-container: #ffdad6;
+  --sm-secondary: #0040e0;
+  --sm-surface: #f7faf8;
+  --sm-primary-container: #006d5b;
+  --sm-tertiary-fixed-dim: #44d8f1;
+  --sm-inverse-surface: #2d3130;
+  --sm-tertiary: #00505b;
+  --sm-on-error: #ffffff;
+  --sm-on-tertiary-fixed-variant: #004e59;
+  --sm-surface-bright: #f7faf8;
+  --sm-on-secondary: #ffffff;
+  --sm-secondary-fixed: #dde1ff;
+  --sm-surface-variant: #e0e3e1;
+  --sm-surface-container-high: #e6e9e7;
+  --sm-surface-tint: #006b59;
+  --sm-primary-fixed: #9df3dc;
+  --sm-on-secondary-fixed: #001356;
+  --sm-on-error-container: #93000a;
+  --sm-outline-variant: #bec9c4;
+  --sm-surface-container-highest: #e0e3e1;
+  --sm-on-primary-container: #96ebd5;
+  --sm-background: #f7faf8;
+  --sm-outline: #6e7975;
+  --sm-secondary-fixed-dim: #b8c3ff;
+  --sm-on-primary: #ffffff;
+  --sm-inverse-primary: #81d6c0;
+  --sm-on-secondary-container: #efefff;
+  --sm-on-primary-fixed: #00201a;
+  --sm-tertiary-fixed: #a1efff;
+  --sm-surface-container-lowest: #ffffff;
+
+  // Modern Shadow (Ambient)
+  --sm-shadow-ambient: 0px 8px 24px rgba(24, 28, 27, 0.06);
+}
+
+.font-headline { font-family: 'Manrope', sans-serif; }
+.font-body { font-family: 'Inter', sans-serif; }
+
+.bg-map-overlay {
+  background-image: linear-gradient(
+    to bottom, 
+    rgba(247, 250, 248, 0.9) 0%, 
+    rgba(247, 250, 248, 0) 15%, 
+    rgba(247, 250, 248, 0) 70%, 
+    rgba(247, 250, 248, 0.9) 100%
+  );
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(190, 201, 196, 0.1);
+}
+
+.btn-primary-gradient {
+  background: linear-gradient(135deg, var(--sm-primary), var(--sm-primary-container));
+  color: var(--sm-on-primary);
+  box-shadow: 0 10px 15px -3px rgba(0, 83, 68, 0.2);
+  transition: all 0.2s ease;
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}

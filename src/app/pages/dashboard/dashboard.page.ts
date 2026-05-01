@@ -1,11 +1,29 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, AlertController, ActionSheetController, ModalController } from '@ionic/angular';
-import { RouterLink } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { AlertController, ActionSheetController, ModalController, MenuController, IonIcon, IonMenuButton } from '@ionic/angular/standalone';
+import { RouterLink, Router } from '@angular/router';
 import { RutasService, Ruta } from '../../services/rutas.service';
 import { NotificationsService } from '../../services/notifications.service';
 import { NotificationCenterComponent } from '../../components/notification-center/notification-center.component';
 import { HttpClientModule } from '@angular/common/http';
+import { 
+  menuOutline, 
+  notificationsOutline, 
+  map, 
+  navigate, 
+  bus, 
+  chevronForwardOutline, 
+  radioButtonOnOutline, 
+  busOutline,
+  homeOutline,
+  alertCircleOutline,
+  settingsOutline,
+  moon,
+  sunny,
+  closeOutline,
+  person
+} from 'ionicons/icons';
 
 interface EstadoRecoleccion {
   estado: 'en_camino' | 'completado' | 'pendiente';
@@ -28,16 +46,35 @@ interface DiaCalendario {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, IonicModule, RouterLink, HttpClientModule],
+  imports: [CommonModule, IonIcon, IonMenuButton, RouterLink, HttpClientModule],
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
 })
 export class DashboardPage implements OnInit {
+  private router = inject(Router);
   private rutasService = inject(RutasService);
   private alertController = inject(AlertController);
   private actionSheetController = inject(ActionSheetController);
   private modalController = inject(ModalController);
+  private menuCtrl = inject(MenuController);
   public notificationsService = inject(NotificationsService);
+
+  constructor() {
+    addIcons({
+      menuOutline,
+      notificationsOutline,
+      map,
+      navigate,
+      bus,
+      chevronForwardOutline,
+      radioButtonOnOutline,
+      busOutline
+    });
+  }
+
+  abrirMenu() {
+    this.menuCtrl.open('main-menu');
+  }
 
   // Signals para datos reactivos
   rutas = signal<Ruta[]>([]);
@@ -167,6 +204,7 @@ export class DashboardPage implements OnInit {
   }
 
   async seleccionarDia(dia: DiaCalendario) {
+    console.log('Día seleccionado:', dia);
     this.diasSemana.forEach(d => d.seleccionado = false);
     dia.seleccionado = true;
 
@@ -247,5 +285,54 @@ export class DashboardPage implements OnInit {
       handle: true
     });
     return await modal.present();
+  }
+
+  abrirMapa() {
+    this.router.navigate(['/mapa']);
+  }
+
+  abrirRutas() {
+    this.router.navigate(['/rutas']);
+  }
+
+  async reportarIncidencia() {
+    const alert = await this.alertController.create({
+      header: 'Reportar Incidencia',
+      message: '¿Qué tipo de problema deseas reportar?',
+      buttons: [
+        {
+          text: 'Basura no recogida',
+          handler: () => this.confirmarReporte('Basura no recogida')
+        },
+        {
+          text: 'Camión con retraso',
+          handler: () => this.confirmarReporte('Camión con retraso')
+        },
+        {
+          text: 'Otro',
+          handler: () => this.confirmarReporte('Otro problema')
+        },
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  private async confirmarReporte(tipo: string) {
+    const alert = await this.alertController.create({
+      header: 'Reporte Enviado',
+      message: `Gracias por tu reporte de: ${tipo}. Nuestro equipo lo revisará pronto.`,
+      buttons: ['Aceptar']
+    });
+    await alert.present();
+    
+    this.notificationsService.addNotification(
+      'Reporte Recibido',
+      `Tu reporte sobre "${tipo}" ha sido enviado correctamente.`,
+      'success'
+    );
   }
 }

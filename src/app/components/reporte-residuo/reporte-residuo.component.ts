@@ -18,7 +18,6 @@ import { TipoResiduo } from '../../services/mapa.service';
 export class ReporteResiduoComponent {
   reporteForm: FormGroup;
   imagenPreview = signal<string | null>(null);
-  ubicacion = signal<{latitude: number, longitude: number} | null>(null);
 
   tiposResiduo = [
     { value: TipoResiduo.PLASTICO, label: 'Plástico' },
@@ -90,32 +89,15 @@ export class ReporteResiduoComponent {
     });
     await actionSheet.present();
   }
-
-  async actualizarUbicacion() {
-    try {
-      const position = await Geolocation.getCurrentPosition({
-        enableHighAccuracy: true
-      });
-
-      this.ubicacion.set({
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude
-      });
-    } catch (error) {
-      console.error('Error obteniendo ubicación:', error);
-    }
-  }
-
   async enviarReporte() {
-    if (!this.reporteForm.valid || !this.ubicacion()) {
+    if (!this.reporteForm.valid) {
       return;
     }
 
     const { nombre, correo, tipo, descripcion, cantidad } = this.reporteForm.value;
     
-    // Concatenar cantidad y ubicación en la descripción
-    const ubicacionValue = this.ubicacion();
-    const descAmpliada = `${descripcion}\n- Cantidad aprox: ${cantidad} kg\n- Ubicación GPS: ${ubicacionValue?.latitude}, ${ubicacionValue?.longitude}`;
+    // Concatenar cantidad en la descripción
+    const descAmpliada = `${descripcion}\n- Cantidad aprox: ${cantidad} kg`;
 
     const formData = new FormData();
     formData.append('nombre', nombre);
@@ -144,7 +126,6 @@ export class ReporteResiduoComponent {
         // Resetear formulario
         this.reporteForm.reset({ tipo: TipoResiduo.PLASTICO });
         this.imagenPreview.set(null);
-        this.ubicacion.set(null);
       },
       error: async (err) => {
         console.error('Error enviando reporte:', err);

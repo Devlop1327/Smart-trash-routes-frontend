@@ -1,9 +1,57 @@
 /* Estilos específicos para la página de reportar */
-ion-content {
-  --background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+.standard-dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+  color: #1e293b;
+  overflow: hidden;
 }
 
-:host-context(.dark) ion-content,
-:host-context([data-theme='dark']) ion-content {
-  --background: linear-gradient(135deg, #022c22 0%, #082f49 100%);
+.custom-header {
+  background: #ffffff;
+  padding: calc(32px + var(--ion-safe-area-top)) 20px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .header-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0;
+      color: #059669;
+    }
+    
+    .menu-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      ion-icon { font-size: 24px; color: #1e293b; }
+    }
+  }
+}
+
+.dashboard-content-scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ============================================
+   MODO OSCURO - GRADIENTE AZUL
+   ============================================ */
+:host-context(.dark) .standard-dashboard,
+:host-context([data-theme='dark']) .standard-dashboard {
+  background: linear-gradient(to bottom, #083d6a 0%, #2e6ea5 100%);
+  color: white;
+
+  .custom-header { background: transparent; border-color: rgba(255, 255, 255, 0.1); .header-title { color: #34d399; } }
+  .menu-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); ion-icon { color: white; } }
 }

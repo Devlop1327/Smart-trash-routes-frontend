@@ -1,49 +1,86 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-    <ion-title>Ajustes</ion-title>
-  </ion-toolbar>
-</ion-header>
+<div class="standard-dashboard">
+  <!-- Custom Header -->
+  <header class="custom-header">
+    <div class="header-content">
+      <ion-buttons slot="start">
+        <ion-menu-button menu="main-menu" class="menu-btn">
+          <ion-icon name="menu-outline"></ion-icon>
+        </ion-menu-button>
+      </ion-buttons>
+      <h1 class="header-title">Configuración</h1>
+      <div style="width: 44px;"></div> <!-- Spacer for symmetry -->
+    </div>
+  </header>
 
-<ion-content [fullscreen]="true">
-  <ion-list>
-    <ion-item>
-      <ion-label>Tema Oscuro</ion-label>
-      <ion-toggle 
-        [checked]="isDark()" 
-        (click)="toggleTheme(); $event.stopPropagation()">
-      </ion-toggle>
-    </ion-item>
+  <div class="dashboard-content-scroll">
+    <div class="section-group">
+      <h2 class="section-title-std">Preferencias</h2>
+      
+      <div class="premium-card-settings">
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="icon-circle color-theme">
+              <ion-icon [name]="isDark() ? 'moon' : 'sunny'"></ion-icon>
+            </div>
+            <div class="texts">
+              <span class="title">Modo Oscuro</span>
+              <span class="subtitle">Cambia entre tema claro y oscuro</span>
+            </div>
+          </div>
+          <ion-toggle [checked]="isDark()" (click)="toggleTheme(); $event.stopPropagation()"></ion-toggle>
+        </div>
 
-    <ion-item>
-      <ion-label>Notificaciones</ion-label>
-      <ion-toggle [checked]="true"></ion-toggle>
-    </ion-item>
+        <div class="divider"></div>
 
-    <ion-item>
-      <ion-label>GPS Siempre Activo</ion-label>
-      <ion-toggle 
-        [checked]="gpsAlwaysActive()" 
-        (ionChange)="toggleGpsAlways()">
-      </ion-toggle>
-    </ion-item>
-  </ion-list>
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="icon-circle color-notif">
+              <ion-icon name="notifications-outline"></ion-icon>
+            </div>
+            <div class="texts">
+              <span class="title">Notificaciones</span>
+              <span class="subtitle">Recibe avisos de recolección</span>
+            </div>
+          </div>
+          <ion-toggle [checked]="true"></ion-toggle>
+        </div>
 
-  <ion-list-header>
-    <ion-label>Información</ion-label>
-  </ion-list-header>
+        <div class="divider"></div>
 
-  <ion-list>
-    <ion-item>
-      <ion-label>Versión</ion-label>
-      <ion-note slot="end">1.0.0</ion-note>
-    </ion-item>
+        <div class="setting-item">
+          <div class="setting-info">
+            <div class="icon-circle color-gps">
+              <ion-icon name="navigate-outline"></ion-icon>
+            </div>
+            <div class="texts">
+              <span class="title">GPS Siempre Activo</span>
+              <span class="subtitle">Seguimiento en tiempo real</span>
+            </div>
+          </div>
+          <ion-toggle [checked]="gpsAlwaysActive()" (ionChange)="toggleGpsAlways()"></ion-toggle>
+        </div>
+      </div>
+    </div>
 
-    <ion-item>
-      <ion-label>Desarrollado por</ion-label>
-      <ion-note slot="end">STR Team</ion-note>
-    </ion-item>
-  </ion-list>
-</ion-content>
+    <div class="section-group" style="margin-top: 32px;">
+      <h2 class="section-title-std">Acerca de</h2>
+      
+      <div class="premium-card-settings">
+        <div class="info-row">
+          <span class="label">Versión</span>
+          <span class="value">1.0.0</span>
+        </div>
+        <div class="divider"></div>
+        <div class="info-row">
+          <span class="label">Soporte</span>
+          <span class="value">soporte@str.com</span>
+        </div>
+        <div class="divider"></div>
+        <div class="info-row">
+          <span class="label">Desarrollado por</span>
+          <span class="value font-bold">STR Team</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

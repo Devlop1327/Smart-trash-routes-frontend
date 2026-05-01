@@ -1,4 +1,6 @@
 import { Component, inject } from '@angular/core';
+import { addIcons } from 'ionicons';
+import { closeOutline, notificationsOffOutline, trashOutline } from 'ionicons/icons';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController, AlertController } from '@ionic/angular';
 import { NotificationsService, Notification } from '../../services/notifications.service';
@@ -8,91 +10,118 @@ import { NotificationsService, Notification } from '../../services/notifications
   standalone: true,
   imports: [CommonModule, IonicModule],
   template: `
-    <ion-header class="ion-no-border">
-      <ion-toolbar class="modal-toolbar">
-        <ion-title>Notificaciones</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="dismiss()">
-            <ion-icon name="close"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content class="modal-content">
-      <div class="header-actions" *ngIf="notifications().length > 0">
-        <ion-button fill="clear" size="small" (click)="notificationsService.markAllAsRead()">
-          Marcar todas como leídas
-        </ion-button>
-        <ion-button fill="clear" size="small" color="danger" (click)="notificationsService.clearAll()">
-          Limpiar historial
-        </ion-button>
-      </div>
-
-      <div class="empty-state" *ngIf="notifications().length === 0">
-        <div class="empty-icon-bg">
-          <ion-icon name="notifications-off-outline"></ion-icon>
+    <div class="modal-wrapper-std">
+      <header class="modal-header-std">
+        <div class="header-inner">
+          <h2 class="modal-title-std">Notificaciones</h2>
+          <button class="close-btn-std" (click)="dismiss()">
+            <ion-icon name="close-outline"></ion-icon>
+          </button>
         </div>
-        <h3>No tienes notificaciones</h3>
-        <p>Te avisaremos cuando haya novedades en tu ruta de recolección.</p>
-      </div>
+      </header>
 
-      <ion-list class="notification-list" lines="none">
-        <ion-item-sliding *ngFor="let n of notifications()" class="notification-item-wrapper">
-          <ion-item-options side="start">
-            <ion-item-option color="primary" (click)="notificationsService.markAsRead(n.id)" *ngIf="!n.read">
-              <ion-icon slot="icon-only" name="checkmark-done"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
+      <div class="modal-body-std">
+        <div class="header-actions" *ngIf="notifications().length > 0">
+          <button class="action-link-std" (click)="notificationsService.markAllAsRead()">
+            Marcar todas como leídas
+          </button>
+          <button class="action-link-std color-danger" (click)="notificationsService.clearAll()">
+            Limpiar historial
+          </button>
+        </div>
 
-          <ion-item class="notification-item" [class.unread]="!n.read" (click)="notificationsService.markAsRead(n.id)">
-            <div class="type-indicator" [class]="n.type"></div>
-            <div class="notification-content">
-              <div class="notif-header">
-                <span class="notif-title">{{ n.title }}</span>
-                <span class="notif-time">{{ formatTime(n.timestamp) }}</span>
+        <div class="empty-state" *ngIf="notifications().length === 0">
+          <div class="empty-icon-bg">
+            <ion-icon name="notifications-off-outline"></ion-icon>
+          </div>
+          <h3>No tienes notificaciones</h3>
+          <p>Te avisaremos cuando haya novedades en tu ruta de recolección.</p>
+        </div>
+
+        <div class="notification-list-std">
+          <div *ngFor="let n of notifications()" 
+               class="notif-card-std" 
+               [class.is-unread]="!n.read"
+               (click)="notificationsService.markAsRead(n.id)">
+            <div class="notif-accent" [class]="n.type"></div>
+            <div class="notif-content-std">
+              <div class="notif-header-std">
+                <span class="notif-title-std">{{ n.title }}</span>
+                <span class="notif-time-std">{{ formatTime(n.timestamp) }}</span>
               </div>
-              <p class="notif-message">{{ n.message }}</p>
+              <p class="notif-msg-std">{{ n.message }}</p>
             </div>
-            <div class="unread-dot" *ngIf="!n.read"></div>
-          </ion-item>
-
-          <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="confirmDelete(n.id)">
-              <ion-icon slot="icon-only" name="trash"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-      </ion-list>
-    </ion-content>
+            <div class="notif-actions-std">
+              <button class="delete-btn-std" (click)="confirmDelete(n.id); $event.stopPropagation()">
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
+            </div>
+            <div class="unread-mark" *ngIf="!n.read"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   `,
   styles: [`
-    .modal-toolbar {
-      --background: var(--ion-background-color);
-      --padding-top: 10px;
-      --padding-bottom: 10px;
-      
-      ion-title {
+    .modal-wrapper-std {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+    }
+
+    .modal-header-std {
+      background: white;
+      padding: 20px;
+      border-bottom: 1px solid #e2e8f0;
+
+      .header-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-title-std {
+        margin: 0;
+        font-size: 22px;
         font-weight: 800;
-        font-size: 24px;
-        letter-spacing: -0.5px;
+        color: #1e293b;
+      }
+
+      .close-btn-std {
+        background: #f1f5f9;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        ion-icon { font-size: 20px; color: #64748b; }
       }
     }
 
-    .modal-content {
-      --background: var(--ion-background-color);
+    .modal-body-std {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
     }
 
     .header-actions {
       display: flex;
       justify-content: space-between;
-      padding: 0 16px;
-      margin-top: 8px;
-      
-      ion-button {
+      margin-bottom: 16px;
+      padding: 0 4px;
+
+      .action-link-std {
+        background: none;
+        border: none;
+        font-size: 13px;
         font-weight: 700;
-        font-size: 12px;
-        text-transform: none;
+        color: #059669;
+        padding: 4px;
+        
+        &.color-danger { color: #ef4444; }
       }
     }
 
@@ -101,118 +130,131 @@ import { NotificationsService, Notification } from '../../services/notifications
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 70%;
-      padding: 40px;
+      height: 60%;
       text-align: center;
-
+      
       .empty-icon-bg {
-        width: 80px;
-        height: 80px;
-        background: var(--ion-color-step-100);
-        border-radius: 24px;
+        width: 72px;
+        height: 72px;
+        background: #f1f5f9;
+        border-radius: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 20px;
-        
-        ion-icon {
-          font-size: 40px;
-          color: var(--ion-color-step-400);
-        }
+        margin-bottom: 16px;
+        ion-icon { font-size: 32px; color: #cbd5e1; }
       }
 
-      h3 {
-        font-weight: 700;
-        margin-bottom: 8px;
-        color: var(--ion-text-color);
-      }
-
-      p {
-        color: var(--ion-color-step-500);
-        font-size: 14px;
-        line-height: 1.5;
-      }
+      h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #1e293b; }
+      p { font-size: 14px; color: #64748b; margin: 0; line-height: 1.5; }
     }
 
-    .notification-list {
-      background: transparent;
-      padding: 12px;
+    .notification-list-std {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .notification-item-wrapper {
-      margin-bottom: 12px;
+    .notif-card-std {
+      background: white;
       border-radius: 16px;
-      overflow: hidden;
-    }
+      padding: 16px;
+      display: flex;
+      gap: 16px;
+      border: 1px solid #e2e8f0;
+      position: relative;
+      transition: all 0.2s ease;
 
-    .notification-item {
-      --background: var(--ion-color-step-50);
-      --padding-start: 16px;
-      --inner-padding-end: 16px;
-      --min-height: 80px;
-      border-radius: 16px;
-      border: 1px solid var(--ion-color-step-100);
-
-      &.unread {
-        --background: var(--ion-background-color);
-        border-color: var(--ion-color-primary-tint, #006d5b33);
-        box-shadow: 0 4px 12px rgba(0, 109, 91, 0.05);
-
-        .notif-title {
-          font-weight: 800;
-        }
+      &.is-unread {
+        border-color: #d1fae5;
+        background: #f0fdf4;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.05);
       }
+
+      &:active { transform: scale(0.98); }
     }
 
-    .type-indicator {
+    .notif-accent {
       width: 4px;
       height: 40px;
       border-radius: 2px;
-      margin-right: 16px;
-      
+      flex-shrink: 0;
       &.info { background: #3b82f6; }
       &.success { background: #10b981; }
       &.warning { background: #f59e0b; }
       &.alert { background: #ef4444; }
     }
 
-    .notification-content {
-      width: 100%;
-      padding: 12px 0;
+    .notif-content-std {
+      flex: 1;
     }
 
-    .notif-header {
+    .notif-header-std {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 4px;
+
+      .notif-title-std { font-size: 15px; font-weight: 700; color: #1e293b; }
+      .notif-time-std { font-size: 11px; color: #94a3b8; font-weight: 600; }
     }
 
-    .notif-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--ion-text-color);
+    .notif-msg-std { font-size: 13px; color: #64748b; margin: 0; line-height: 1.4; }
+
+    .notif-actions-std {
+      display: flex;
+      align-items: flex-start;
     }
 
-    .notif-time {
-      font-size: 11px;
-      color: var(--ion-color-step-500);
-      font-weight: 500;
+    .delete-btn-std {
+      background: none;
+      border: none;
+      padding: 4px;
+      ion-icon { font-size: 18px; color: #cbd5e1; }
+      &:active ion-icon { color: #ef4444; }
     }
 
-    .notif-message {
-      font-size: 13px;
-      color: var(--ion-color-step-600);
-      margin: 0;
-      line-height: 1.4;
-    }
-
-    .unread-dot {
+    .unread-mark {
+      position: absolute;
+      top: 12px;
+      right: 12px;
       width: 8px;
       height: 8px;
-      background: #006d5b;
+      background: #059669;
       border-radius: 50%;
-      margin-left: 8px;
+    }
+
+    :host-context(.dark) .modal-wrapper-std,
+    :host-context([data-theme='dark']) .modal-wrapper-std {
+      background: linear-gradient(to bottom, #083d6a 0%, #2e6ea5 100%);
+      
+      .modal-header-std { 
+        background: transparent; 
+        border-color: rgba(255, 255, 255, 0.1); 
+        .modal-title-std { color: white; } 
+        .close-btn-std { background: rgba(255, 255, 255, 0.1); ion-icon { color: white; } } 
+      }
+      
+      .notif-card-std { 
+        background: rgba(255, 255, 255, 0.05); 
+        backdrop-filter: blur(10px); 
+        border-color: rgba(255, 255, 255, 0.1); 
+        .notif-title-std { color: white; } 
+        .notif-msg-std { color: rgba(255, 255, 255, 0.7); } 
+      }
+      
+      .notif-card-std.is-unread { 
+        background: rgba(16, 185, 129, 0.15); 
+        border-color: rgba(16, 185, 129, 0.3); 
+      }
+
+      .empty-state {
+        .empty-icon-bg { background: rgba(255, 255, 255, 0.1); ion-icon { color: white; } }
+        h3 { color: white; }
+        p { color: rgba(255, 255, 255, 0.6); }
+      }
+
+      .action-link-std { color: #34d399; &.color-danger { color: #f87171; } }
     }
   `]
 })
@@ -222,6 +264,10 @@ export class NotificationCenterComponent {
   private alertCtrl = inject(AlertController);
 
   notifications = this.notificationsService.allNotifications;
+
+  constructor() {
+    addIcons({ closeOutline, notificationsOffOutline, trashOutline });
+  }
 
   dismiss() {
     this.modalCtrl.dismiss();

@@ -1,131 +1,112 @@
-<ion-content [fullscreen]="true" class="modern-dashboard">
-  <!-- Header moderno -->
-  <ion-header class="ion-no-border">
-    <ion-toolbar class="modern-toolbar">
-      <ion-buttons slot="start">
-        <ion-menu-button></ion-menu-button>
-      </ion-buttons>
-      <ion-title>Smart Trash Routes</ion-title>
-      <ion-buttons slot="end">
-        <ion-button class="btn-notifications" (click)="abrirNotificaciones()">
-          <ion-icon name="notifications-sharp"></ion-icon>
-          <ion-badge class="notif-badge" *ngIf="notificationsService.unreadCount() > 0">
+<div class="standard-dashboard">
+  <!-- Custom Header -->
+  <header class="custom-header">
+    <div class="header-content">
+      <ion-menu-button menu="main-menu" class="menu-btn">
+        <ion-icon name="menu-outline"></ion-icon>
+      </ion-menu-button>
+      <h1 class="header-title">Smart Trash</h1>
+      <button class="notif-btn" (click)="abrirNotificaciones()">
+        <ion-icon name="notifications-outline"></ion-icon>
+        @if (notificationsService.unreadCount() > 0) {
+          <span class="notif-badge-standard">
             {{ notificationsService.unreadCount() }}
-          </ion-badge>
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
+          </span>
+        }
+      </button>
+    </div>
+  </header>
 
-  <div class="dashboard-scroll">
-    <!-- Saludo personalizado -->
-    <ion-text class="welcome-section">
-      <p class="welcome-subtitle">
-      </p>
-    </ion-text>
-
-    <!-- Botones principales ciudadano -->
-    <div class="main-actions">
-      <ion-card class="action-card mapa-card" [routerLink]="['/mapa']">
-        <ion-card-content class="action-content">
-          <ion-icon name="map" class="action-icon"></ion-icon>
-          <div class="action-info">
-            <ion-label class="action-label">Ver Mapa</ion-label>
-            <ion-note class="action-sublabel">Ubica tu camión en tiempo real</ion-note>
-          </div>
-          <ion-icon name="chevron-forward" class="action-arrow"></ion-icon>
-        </ion-card-content>
-      </ion-card>
-
-      <ion-card class="action-card rutas-card" [routerLink]="['/rutas']">
-        <ion-card-content class="action-content">
-          <ion-icon name="navigate" class="action-icon"></ion-icon>
-          <div class="action-info">
-            <ion-label class="action-label">Ver Rutas</ion-label>
-            <ion-note class="action-sublabel">
-              {{ rutas().length > 0 ? rutas().length + ' rutas disponibles' : 'Ver todas las rutas' }}
-            </ion-note>
-          </div>
-          <ion-icon name="chevron-forward" class="action-arrow"></ion-icon>
-        </ion-card-content>
-      </ion-card>
+  <div class="dashboard-content-scroll">
+    <!-- Welcome -->
+    <div class="welcome-container">
+      <p class="welcome-msg">Hola, vecino. Aquí tienes el estado de hoy.</p>
     </div>
 
-    <!-- Calendario de recolección - Generado dinámicamente -->
-    <div class="calendar-section expanded">
-      <ion-text class="section-title">Calendario Semanal</ion-text>
-      <ion-grid class="week-calendar-grid">
-        <ion-row>
-          <ion-col
-            size="4"
-            *ngFor="let dia of diasSemana"
-            class="calendar-col">
-            <div 
-              class="day-item"
-              [class.today]="dia.esHoy"
-              [class.weekend]="dia.esFinDeSemana"
-              [class.selected]="dia.seleccionado"
-              (click)="seleccionarDia(dia)">
-              <ion-text class="day-name">{{ dia.nombre }}</ion-text>
-              <ion-text class="day-date">{{ dia.fecha }}</ion-text>
-              <ion-badge
-                *ngIf="dia.estado !== 'no-service' && dia.estado !== 'pending'"
-                class="day-status"
-                [class.collected]="dia.estado === 'collected'"
-                [class.scheduled]="dia.estado === 'scheduled'"
-                [color]="dia.estado === 'collected' ? 'success' : 'medium'">
-                <ion-icon [name]="dia.estado === 'collected' ? 'checkmark' : 'time'"></ion-icon>
-              </ion-badge>
-              <div *ngIf="dia.estado === 'pending'" class="day-status pending">
-                <span class="day-dot"></span>
-              </div>
-              <div *ngIf="dia.estado === 'no-service'" class="day-status no-service">
-                <span>-</span>
-              </div>
-              
-              <!-- Indicador de nota (Tarjetita) -->
-              <div class="note-card-mini" *ngIf="dia.nota">
-                <div class="card-line"></div>
-                <span class="note-text-mini">{{ dia.nota }}</span>
-              </div>
-            </div>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </div>
-
-    <div class="my-collection-section expanded-v4" *ngIf="rutaEnProgreso() as ruta">
-      <div class="section-header-flex">
-        <ion-text class="section-title">Estado de tu Recolección</ion-text>
-        <ion-button fill="clear" size="small" class="btn-change-route" (click)="seleccionarRuta()">
-          <ion-icon name="swap-horizontal-outline" slot="start"></ion-icon>
-          Cambiar Ruta
-        </ion-button>
+    <!-- Main Actions (Native Cards) -->
+    <div class="main-actions-grid">
+      <div class="native-card map-card-bg" (click)="abrirMapa()">
+        <div class="card-icon-circle">
+          <ion-icon name="map"></ion-icon>
+        </div>
+        <div class="card-info">
+          <span class="card-title">Ver Mapa</span>
+          <span class="card-subtitle">Ubica tu camión ahora</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
       </div>
-      <ion-card class="collection-status-card active clickable-card" [routerLink]="['/mapa']">
-        <ion-card-header class="status-header">
-          <ion-chip class="status-badge" color="success">
-            <span class="pulse"></span>
-            <ion-label>En camino</ion-label>
-          </ion-chip>
-          <ion-note class="status-time">Llega aprox: {{ ruta.horaLlegada }}</ion-note>
-        </ion-card-header>
-        <ion-card-content class="status-details">
-          <div class="truck-info">
-            <ion-avatar class="truck-icon">
-              <ion-icon name="bus"></ion-icon>
-            </ion-avatar>
-            <div class="truck-details">
-              <ion-label class="truck-route">{{ ruta.nombreRuta }}</ion-label>
-              <ion-note class="truck-distance">{{ ruta.distancia }}</ion-note>
+
+      <div class="native-card routes-card-bg" (click)="abrirRutas()">
+        <div class="card-icon-circle">
+          <ion-icon name="navigate"></ion-icon>
+        </div>
+        <div class="card-info">
+          <span class="card-title">Ver Rutas</span>
+          <span class="card-subtitle">{{ rutas().length }} rutas activas</span>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+      </div>
+    </div>
+
+    <!-- Tracking Section -->
+    @if (rutaEnProgreso(); as ruta) {
+      <div class="tracking-section">
+        <div class="section-header-flex">
+          <h2 class="section-title-std">Tu Recolección</h2>
+          <button class="text-btn" (click)="seleccionarRuta()">Cambiar Ruta</button>
+        </div>
+        
+        <div class="tracking-card-std" (click)="abrirMapa()" routerLink="/mapa" style="cursor: pointer;">
+          <div class="tracking-header">
+            <div class="status-indicator">
+              <span class="pulse-dot"></span>
+              <span class="status-text">En camino</span>
+            </div>
+            <span class="arrival-time">Llega: {{ ruta.horaLlegada }}</span>
+          </div>
+          
+          <div class="tracking-body">
+            <div class="truck-box">
+              <div class="truck-icon-bg">
+                <ion-icon name="bus"></ion-icon>
+              </div>
+              <div class="truck-texts">
+                <span class="route-name">{{ ruta.nombreRuta }}</span>
+                <span class="route-dist">{{ ruta.distancia }}</span>
+              </div>
+            </div>
+            <div class="countdown-circle">
+              <span class="num">{{ ruta.tiempoEstimado }}</span>
+              <span class="lab">min</span>
             </div>
           </div>
-          <ion-badge class="countdown" color="success">
-            <span class="countdown-value">{{ ruta.tiempoEstimado }}</span>
-            <span class="countdown-label">min</span>
-          </ion-badge>
-        </ion-card-content>
-      </ion-card>
+        </div>
+      </div>
+    }
+
+    <!-- Calendar Section -->
+    <div class="calendar-section-std">
+      <h2 class="section-title-std">Calendario Semanal</h2>
+      <div class="week-grid-std">
+        @for (dia of diasSemana; track dia.fecha) {
+          <div 
+            class="day-box-std"
+            [class.is-today]="dia.esHoy"
+            [class.is-selected]="dia.seleccionado"
+            (click)="seleccionarDia(dia)">
+            <span class="day-n">{{ dia.nombre }}</span>
+            <div class="day-c">
+              <span class="day-d">{{ dia.fecha }}</span>
+            </div>
+            @if (dia.estado !== 'no-service') {
+              <div class="day-i">
+                <span class="d-dot" [class.d-collected]="dia.estado === 'collected'" [class.d-pending]="dia.estado === 'pending'"></span>
+              </div>
+            }
+          </div>
+        }
+      </div>
     </div>
+
   </div>
-</ion-content>
+</div>

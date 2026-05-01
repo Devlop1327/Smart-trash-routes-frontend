@@ -75,7 +75,9 @@ export class MapaNavigatorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngAfterViewInit() {
-    this.mapaService.inicializarMapa('mapa');
+    setTimeout(() => {
+      this.mapaService.inicializarMapa('mapa');
+    }, 100);
   }
 
   tiempoEstimado(): string {
