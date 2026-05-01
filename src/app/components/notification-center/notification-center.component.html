@@ -1,0 +1,58 @@
+<div class="modal-wrapper-std">
+  <header class="modal-header-std">
+    <div class="header-inner">
+      <h2 class="modal-title-std">Notificaciones</h2>
+      <button class="close-btn-std" (click)="dismiss()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+  </header>
+
+  <div class="modal-body-std">
+    @if (notifications().length > 0) {
+      <div class="header-actions">
+        <button class="action-link-std" (click)="notificationsService.markAllAsRead()">
+          Marcar todas como leídas
+        </button>
+        <button class="action-link-std color-danger" (click)="notificationsService.clearAll()">
+          Limpiar historial
+        </button>
+      </div>
+    }
+
+    @if (notifications().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-bg">
+          <ion-icon name="notifications-off-outline"></ion-icon>
+        </div>
+        <h3>No tienes notificaciones</h3>
+        <p>Te avisaremos cuando haya novedades en tu ruta de recolección.</p>
+      </div>
+    }
+
+    <div class="notification-list-std">
+      @for (n of notifications(); track n.id) {
+        <div class="notif-card-std" 
+             [class.is-unread]="!n.read"
+             (click)="notificationsService.markAsRead(n.id)">
+          <div class="notif-accent" [class]="n.type"></div>
+          <div class="notif-content-std">
+            <div class="notif-header-std">
+              <span class="notif-title-std">{{ n.title }}</span>
+              <span class="notif-time-std">{{ formatTime(n.timestamp) }}</span>
+            </div>
+            <p class="notif-msg-std">{{ n.message }}</p>
+          </div>
+          <div class="notif-actions-std">
+            <button class="delete-btn-std" (click)="confirmDelete(n.id); $event.stopPropagation()">
+              <ion-icon name="trash-outline"></ion-icon>
+            </button>
+          </div>
+          @if (!n.read) {
+            <div class="unread-mark"></div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -7,13 +7,20 @@
   </div>
 
   <!-- Header Overlay -->
-  <header class="fixed top-0 w-full z-50 glass-panel flex justify-between items-center px-6 py-4">
+  <header class="fixed top-0 w-full z-50 glass-panel flex justify-between items-center px-6">
     <div class="flex items-center gap-4">
-      <button (click)="toggleSelectorRutas()" class="active:scale-95 duration-200 hover:bg-emerald-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors pointer-events-auto">
+      <ion-menu-button auto-hide="false" menu="main-menu" class="active:scale-95 duration-200 hover:bg-emerald-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors pointer-events-auto custom-header-menu-btn">
         <span class="material-symbols-outlined text-emerald-900 dark:text-emerald-500">menu</span>
-      </button>
+      </ion-menu-button>
       <h1 class="font-headline font-bold text-lg tracking-tight text-emerald-900 dark:text-emerald-500">Gestión de Residuos</h1>
     </div>
+
+    <!-- Nuevo botón para Rutas -->
+    <button (click)="toggleSelectorRutas()" 
+            class="active:scale-95 duration-200 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 p-2 rounded-xl bg-emerald-50/50 dark:bg-emerald-500/10 transition-colors pointer-events-auto flex items-center gap-2 border border-emerald-100/20 shadow-sm group">
+      <span class="material-symbols-outlined text-emerald-900 dark:text-emerald-500 group-hover:scale-110 duration-200">route</span>
+      <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-500 hidden xs:inline">Explorar Rutas</span>
+    </button>
   </header>
 
   <!-- Search Overlay Section removed -->
@@ -68,7 +75,8 @@
 
   <!-- Route Selector Panel Overlay -->
   @if (mostrarSelectorRutas()) {
-    <div class="fixed inset-0 z-[60] flex items-center justify-center px-6 py-10 pointer-events-none">
+    <div class="fixed inset-0 z-[60] flex items-start justify-center px-6 pointer-events-none" 
+         style="padding-top: calc(110px + var(--ion-safe-area-top)); padding-bottom: 32px;">
       <div class="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto" (click)="toggleSelectorRutas()"></div>
       <div class="w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-outline-variant/10 pointer-events-auto animate-fade-in-up relative flex flex-col max-h-full">
         <div class="flex justify-between items-center mb-4 flex-shrink-0">

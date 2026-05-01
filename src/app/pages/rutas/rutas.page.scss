@@ -4,6 +4,7 @@
 
 .rutas-content {
   padding: 16px;
+  min-height: 100%;
 }
 
 // Loading
@@ -49,11 +50,11 @@
 .section-title {
   display: block;
   font-size: 14px;
-  font-weight: 600;
-  color: var(--ion-color-step-500);
+  font-weight: 800;
+  color: #64748b;
   margin-bottom: 16px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 // Rutas list
@@ -66,10 +67,12 @@
 // Ruta card
 .ruta-card {
   margin: 0;
-  border-radius: 16px;
-  --background: var(--ion-color-step-50);
+  border-radius: 20px;
+  background: white;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 
   &:active {
     transform: scale(0.98);
@@ -83,17 +86,18 @@
 }
 
 .ruta-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 16px;
   flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 
   ion-icon {
-    font-size: 24px;
+    font-size: 26px;
     color: white;
   }
 }
@@ -106,10 +110,10 @@
 }
 
 .ruta-nombre {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 700;
-  color: var(--ion-text-color);
-  margin-bottom: 4px;
+  color: #1e293b;
+  margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -117,12 +121,13 @@
 
 .ruta-id {
   font-size: 12px;
-  color: var(--ion-color-step-400);
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 .ruta-arrow {
-  font-size: 24px;
-  color: var(--ion-color-step-300);
+  font-size: 20px;
+  color: #cbd5e1;
   flex-shrink: 0;
   margin-left: 8px;
 }
@@ -139,16 +144,52 @@
 
   ion-icon {
     font-size: 64px;
+    color: #cbd5e1;
   }
 
   ion-text {
     font-size: 18px;
-    font-weight: 600;
-    color: var(--ion-text-color);
+    font-weight: 700;
+    color: #1e293b;
   }
 
   ion-note {
     font-size: 14px;
-    color: var(--ion-color-step-400);
+    color: #64748b;
+  }
+}
+
+/* ============================================
+   MODO OSCURO - PALETA NAVY
+   ============================================ */
+:host-context(.dark) .rutas-page,
+:host-context([data-theme='dark']) .rutas-page {
+  --background: linear-gradient(to bottom, #001D39 0%, #001D39 55%, #BDD8E9 88%, #FFFFFF 100%);
+  
+  ion-toolbar {
+    --background: transparent;
+    --color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .section-title { color: rgba(255, 255, 255, 0.6); }
+
+  .ruta-card {
+    background: rgba(10, 65, 116, 0.4);
+    backdrop-filter: blur(20px);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    
+    .ruta-nombre { color: white; }
+    .ruta-id { color: rgba(255, 255, 255, 0.5); }
+    .ruta-arrow { color: rgba(255, 255, 255, 0.3); }
+  }
+
+  .loading-container ion-text { color: rgba(255, 255, 255, 0.6); }
+  
+  .empty-container {
+    ion-icon { color: rgba(255, 255, 255, 0.2); }
+    ion-text { color: white; }
+    ion-note { color: rgba(255, 255, 255, 0.5); }
   }
 }

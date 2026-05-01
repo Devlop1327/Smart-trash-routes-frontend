@@ -9,16 +9,29 @@
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(190, 201, 196, 0.1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding-top: calc(48px + var(--ion-safe-area-top));
+    padding-bottom: 16px;
   }
 }
 
 :host-context([data-theme='dark']) .modern-map-wrapper {
   .glass-panel {
-    background: linear-gradient(to bottom, rgba(8, 61, 106, 0.9) 0%, rgba(46, 110, 165, 0.9) 100%);
+    background: #001D39; 
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
+}
+
+:host-context([data-theme='dark']) .bg-map-overlay {
+  background-image: linear-gradient(
+    to bottom, 
+    rgba(0, 29, 57, 0.95) 0%, 
+    rgba(0, 29, 57, 0) 15%, 
+    rgba(0, 29, 57, 0) 65%, 
+    rgba(189, 216, 233, 0.4) 85%, 
+    rgba(255, 255, 255, 0.95) 100%
+  );
 }
 
 .bg-map-overlay {
@@ -126,6 +139,14 @@
 .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
 .font-bold { font-weight: 700; }
 .font-extrabold { font-weight: 800; }
+.text-on-surface { 
+  color: var(--sm-on-surface); 
+  :host-context(.dark) &, :host-context([data-theme='dark']) & { color: white; }
+}
+.text-on-surface-variant { 
+  color: var(--sm-on-surface-variant); 
+  :host-context(.dark) &, :host-context([data-theme='dark']) & { color: rgba(255, 255, 255, 0.7); }
+}
 .text-sm { font-size: 0.875rem; }
 .text-lg { font-size: 1.125rem; }
 .text-xl { font-size: 1.25rem; }
@@ -135,11 +156,26 @@
 .uppercase { text-transform: uppercase; }
 .backdrop-blur-md { backdrop-filter: blur(8px); }
 .backdrop-blur-xl { backdrop-filter: blur(24px); }
-.bg-white { background-color: #ffffff; }
-.bg-white\/90 { background-color: rgba(255, 255, 255, 0.9); }
-.bg-white\/95 { background-color: rgba(255, 255, 255, 0.95); }
-.bg-emerald-50 { background-color: #ecfdf5; }
-.bg-emerald-100 { background-color: #d1fae5; }
+.bg-white { 
+  background-color: #ffffff; 
+  :host-context(.dark) &, :host-context([data-theme='dark']) & { background-color: #0A4174; }
+}
+.bg-white\/90 { 
+  background-color: rgba(255, 255, 255, 0.9); 
+  :host-context(.dark) &, :host-context([data-theme='dark']) & { background-color: rgba(10, 65, 116, 0.9); }
+}
+.bg-white\/95 { 
+  background-color: rgba(255, 255, 255, 0.95); 
+  :host-context(.dark) &, :host-context([data-theme='dark']) & { background-color: rgba(10, 65, 116, 0.95); }
+}
+.bg-emerald-50 { 
+  background-color: #ecfdf5; 
+  :host-context(.dark) &, :host-context([data-theme='dark']) & { background-color: rgba(123, 189, 232, 0.1); }
+}
+.bg-emerald-100 { 
+  background-color: #d1fae5; 
+  :host-context(.dark) &, :host-context([data-theme='dark']) & { background-color: rgba(123, 189, 232, 0.2); }
+}
 .grid { display: grid; }
 .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .mb-1 { margin-bottom: 0.25rem; }
@@ -156,7 +192,10 @@
 .transition-colors { transition-property: background-color, border-color, color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
 .transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
 
-.bg-slate-50 { background-color: #f8fafc; }
+.bg-slate-50 { 
+  background-color: #f8fafc; 
+  :host-context(.dark) &, :host-context([data-theme='dark']) & { background-color: rgba(0, 29, 57, 0.5); }
+}
 .pl-12 { padding-left: 3rem; }
 .pr-4 { padding-right: 1rem; }
 .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
@@ -180,3 +219,66 @@
 .focus\:ring-2:focus { box-shadow: 0 0 0 2px rgba(0, 83, 68, 0.2); }
 .focus\:border-primary:focus { border-color: var(--sm-primary); }
 .transition-all { transition: all 0.3s ease; }
+
+.hidden { display: none; }
+@media (min-width: 380px) {
+  .xs\:inline { display: inline; }
+}
+
+.custom-header-menu-btn {
+  --background: transparent;
+  --background-focused: rgba(16, 185, 129, 0.1);
+  --background-hover: rgba(16, 185, 129, 0.1);
+  --color: inherit;
+  --padding-start: 0;
+  --padding-end: 0;
+  margin: 0;
+  height: auto;
+  width: auto;
+  
+  &::part(native) {
+    padding: 0;
+  }
+}
+
+// Botón de Explorar Rutas - Dark Mode
+:host-context([data-theme='dark']) {
+  header button {
+    background: rgba(123, 189, 232, 0.1) !important;
+    border-color: rgba(123, 189, 232, 0.2) !important;
+    
+    span { color: #7BBDE8 !important; }
+    
+    &:hover {
+      background: rgba(123, 189, 232, 0.2) !important;
+    }
+  }
+
+  h1.font-headline { color: white !important; }
+  
+  // Panel de Rutas - Dark Mode específico
+  .max-w-md.bg-white {
+    background: linear-gradient(to bottom, #001D39 0%, #001D39 40%, #BDD8E9 90%, #FFFFFF 100%) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    
+    .text-on-surface { color: white !important; }
+    .text-on-surface-variant { color: rgba(255, 255, 255, 0.7) !important; }
+    
+    .bg-slate-50 {
+      background: rgba(255, 255, 255, 0.08) !important;
+      color: white !important;
+      input { color: white !important; &::placeholder { color: rgba(255, 255, 255, 0.4); } }
+    }
+    
+    .hover\:bg-emerald-50:hover, .bg-emerald-50 {
+      background: rgba(123, 189, 232, 0.1) !important;
+    }
+
+    button.rounded-full {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: white !important;
+      &:hover { background: rgba(255, 255, 255, 0.2) !important; }
+      span { font-weight: 800; }
+    }
+  }
+}

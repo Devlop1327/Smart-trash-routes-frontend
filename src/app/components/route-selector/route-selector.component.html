@@ -1,0 +1,51 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="modal-toolbar">
+    <ion-title>Seleccionar Ruta</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancelar()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar class="search-toolbar">
+    <ion-searchbar 
+      placeholder="Buscar tu zona o sector..." 
+      [value]="searchText()" 
+      (ionInput)="searchText.set($event.detail.value || '')"
+      animated="true"
+      class="custom-searchbar">
+    </ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding modal-content">
+  <div class="routes-list">
+    @for (ruta of filteredRoutes(); track ruta.id_ruta) {
+      <div 
+        class="route-item" 
+        [class.selected]="selectedRutaId === ruta.id_ruta"
+        (click)="seleccionar(ruta)">
+        <div class="icon-container" [style.background-color]="ruta.color_hex || '#059669'">
+          <ion-icon name="map-outline"></ion-icon>
+        </div>
+        <div class="route-info">
+          <span class="route-name">{{ ruta.nombre_ruta }}</span>
+          <span class="route-sector">Sector {{ ruta.nombre_ruta.split(' ')[1] || 'General' }}</span>
+        </div>
+        <div class="action-icon">
+          @if (selectedRutaId === ruta.id_ruta) {
+            <ion-icon name="checkmark-circle" color="primary"></ion-icon>
+          } @else {
+            <ion-icon name="chevron-forward-outline"></ion-icon>
+          }
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <ion-icon name="search-outline" class="empty-icon"></ion-icon>
+        <h3>No hay resultados</h3>
+        <p>Intenta con otro nombre de sector o zona.</p>
+      </div>
+    }
+  </div>
+</ion-content>

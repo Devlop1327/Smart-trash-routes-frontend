@@ -5,7 +5,7 @@
       <ion-menu-button menu="main-menu" class="menu-btn">
         <ion-icon name="menu-outline"></ion-icon>
       </ion-menu-button>
-      <h1 class="header-title">Smart Trash</h1>
+      <h1 class="header-title">Smart Trash Routes</h1>
       <button class="notif-btn" (click)="abrirNotificaciones()">
         <ion-icon name="notifications-outline"></ion-icon>
         @if (notificationsService.unreadCount() > 0) {
@@ -53,7 +53,10 @@
       <div class="tracking-section">
         <div class="section-header-flex">
           <h2 class="section-title-std">Tu Recolección</h2>
-          <button class="text-btn" (click)="seleccionarRuta()">Cambiar Ruta</button>
+          <button class="change-route-chip" (click)="seleccionarRuta()">
+            <ion-icon name="radioButtonOnOutline"></ion-icon>
+            Cambiar Ruta
+          </button>
         </div>
         
         <div class="tracking-card-std" (click)="abrirMapa()" routerLink="/mapa" style="cursor: pointer;">

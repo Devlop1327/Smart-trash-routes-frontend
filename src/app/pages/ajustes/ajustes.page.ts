@@ -14,6 +14,7 @@ import { ThemeService } from '../../services/theme.service';
 export class AjustesPage implements OnInit {
   isDark = this.themeService.isDark;
   gpsAlwaysActive = signal<boolean>(false);
+  notificationsActive = signal<boolean>(true);
 
   constructor(private themeService: ThemeService) {}
 
@@ -46,5 +47,9 @@ export class AjustesPage implements OnInit {
 
   toggleTheme() {
     this.themeService.toggleTheme();
+  }
+
+  toggleNotifications() {
+    this.notificationsActive.set(!this.notificationsActive());
   }
 }

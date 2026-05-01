@@ -1,0 +1,207 @@
+.modal-wrapper-std {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+}
+
+.modal-header-std {
+  background: white;
+  padding: 20px;
+  border-bottom: 1px solid #e2e8f0;
+
+  .header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .modal-title-std {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    color: #1e293b;
+  }
+
+  .close-btn-std {
+    background: #f1f5f9;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    ion-icon { font-size: 20px; color: #64748b; }
+  }
+}
+
+.modal-body-std {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0 4px;
+
+  .action-link-std {
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-weight: 700;
+    color: #059669;
+    padding: 4px;
+    
+    &.color-danger { color: #ef4444; }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60%;
+  text-align: center;
+  
+  .empty-icon-bg {
+    width: 72px;
+    height: 72px;
+    background: #f1f5f9;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    ion-icon { font-size: 32px; color: #cbd5e1; }
+  }
+
+  h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: #1e293b; }
+  p { font-size: 14px; color: #64748b; margin: 0; line-height: 1.5; }
+}
+
+.notification-list-std {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notif-card-std {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  border: 1px solid #e2e8f0;
+  position: relative;
+  transition: all 0.2s ease;
+
+  &.is-unread {
+    border-color: #d1fae5;
+    background: #f0fdf4;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.05);
+  }
+
+  &:active { transform: scale(0.98); }
+}
+
+.notif-accent {
+  width: 4px;
+  height: 40px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  &.info { background: #3b82f6; }
+  &.success { background: #10b981; }
+  &.warning { background: #f59e0b; }
+  &.alert { background: #ef4444; }
+}
+
+.notif-content-std {
+  flex: 1;
+}
+
+.notif-header-std {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+
+  .notif-title-std { font-size: 15px; font-weight: 700; color: #1e293b; }
+  .notif-time-std { font-size: 11px; color: #94a3b8; font-weight: 600; }
+}
+
+.notif-msg-std { font-size: 13px; color: #64748b; margin: 0; line-height: 1.4; }
+
+.notif-actions-std {
+  display: flex;
+  align-items: flex-start;
+}
+
+.delete-btn-std {
+  background: none;
+  border: none;
+  padding: 4px;
+  ion-icon { font-size: 18px; color: #cbd5e1; }
+  &:active ion-icon { color: #ef4444; }
+}
+
+.unread-mark {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 8px;
+  height: 8px;
+  background: #059669;
+  border-radius: 50%;
+}
+
+:host-context(.dark) .modal-wrapper-std,
+:host-context([data-theme='dark']) .modal-wrapper-std {
+  background: linear-gradient(to bottom, #001D39 0%, #001D39 55%, #BDD8E9 88%, #FFFFFF 100%);
+  
+  .modal-header-std { 
+    background: transparent; 
+    border-color: rgba(255, 255, 255, 0.1); 
+    .modal-title-std { color: white; } 
+    .close-btn-std { background: rgba(255, 255, 255, 0.1); ion-icon { color: white; } } 
+  }
+  
+  .notif-card-std { 
+    background: rgba(10, 65, 116, 0.4); 
+    backdrop-filter: blur(20px); 
+    border-color: rgba(255, 255, 255, 0.1); 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    
+    .notif-title-std { color: white; font-weight: 800; } 
+    .notif-msg-std { color: rgba(255, 255, 255, 0.8); } 
+    .notif-time-std { color: rgba(255, 255, 255, 0.4); }
+  }
+  
+  .notif-card-std.is-unread { 
+    background: rgba(123, 189, 232, 0.15); 
+    border-color: rgba(123, 189, 232, 0.3); 
+    box-shadow: 0 4px 20px rgba(123, 189, 232, 0.1);
+    
+    .unread-mark { background: #7BBDE8; box-shadow: 0 0 8px #7BBDE8; }
+  }
+
+  .empty-state {
+    .empty-icon-bg { 
+      background: rgba(10, 65, 116, 0.5); 
+      ion-icon { color: #7BBDE8; } 
+    }
+    h3 { color: white; }
+    p { color: rgba(255, 255, 255, 0.6); }
+  }
+
+  .action-link-std { 
+    color: #7BBDE8; 
+    &.color-danger { color: #f87171; } 
+  }
+  
+  .delete-btn-std ion-icon { color: rgba(255, 255, 255, 0.3); }
+}

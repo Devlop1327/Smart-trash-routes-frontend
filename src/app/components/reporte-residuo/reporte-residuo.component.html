@@ -41,18 +41,11 @@
           <ion-icon name="pricetag-outline"></ion-icon>
           <div class="field-content">
             <label>Tipo de Residuo</label>
-            <ion-select 
-              formControlName="tipo" 
-              interface="popover"
-              toggleIcon="chevron-down-outline"
-              placeholder="Selecciona el tipo"
-              class="custom-ion-select">
+            <select formControlName="tipo" class="native-select-fallback">
               @for (tipo of tiposResiduo; track tipo.value) {
-                <ion-select-option [value]="tipo.value">
-                  {{ tipo.label }}
-                </ion-select-option>
+                <option [value]="tipo.value">{{ tipo.label }}</option>
               }
-            </ion-select>
+            </select>
           </div>
         </div>
 

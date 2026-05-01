@@ -6,6 +6,7 @@ import { RouterLink, Router } from '@angular/router';
 import { RutasService, Ruta } from '../../services/rutas.service';
 import { NotificationsService } from '../../services/notifications.service';
 import { NotificationCenterComponent } from '../../components/notification-center/notification-center.component';
+import { RouteSelectorComponent } from '../../components/route-selector/route-selector.component';
 import { HttpClientModule } from '@angular/common/http';
 import { 
   menuOutline, 
@@ -85,6 +86,9 @@ export class DashboardPage implements OnInit {
   diasSemana: DiaCalendario[] = [];
 
   ngOnInit() {
+    // Inicializar con una simulación inmediata para evitar saltos en la UI
+    this.simularRutaEnProgreso(null);
+    
     this.cargarDatos();
     this.generarCalendario();
     this.cargarNotas();
@@ -247,33 +251,30 @@ export class DashboardPage implements OnInit {
   }
 
   async seleccionarRuta() {
-    const rutasDisponibles = this.rutas();
-    if (rutasDisponibles.length === 0) return;
-
-    const buttons = rutasDisponibles.map(ruta => ({
-      text: ruta.nombre_ruta,
-      handler: () => {
-        this.simularRutaEnProgreso(ruta);
-        this.notificationsService.addNotification(
-          'Ruta Seleccionada',
-          `Ahora estás siguiendo la ruta: ${ruta.nombre_ruta}`,
-          'success'
-        );
-      }
-    }));
-
-    const actionSheet = await this.actionSheetController.create({
-      header: 'Selecciona una Ruta',
-      buttons: [
-        ...buttons,
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        }
-      ]
+    const modal = await this.modalController.create({
+      component: RouteSelectorComponent,
+      componentProps: {
+        routes: this.rutas(),
+        selectedRutaId: null // Podría persistir esto si fuera necesario
+      },
+      cssClass: 'premium-modal',
+      initialBreakpoint: 0.8,
+      breakpoints: [0, 0.5, 0.8, 1.0],
+      handle: true
     });
 
-    await actionSheet.present();
+    await modal.present();
+
+    const { data } = await modal.onWillDismiss();
+    
+    if (data) {
+      this.simularRutaEnProgreso(data);
+      this.notificationsService.addNotification(
+        'Ruta Seleccionada',
+        `Ahora estás siguiendo la ruta: ${data.nombre_ruta}`,
+        'success'
+      );
+    }
   }
 
   async abrirNotificaciones() {

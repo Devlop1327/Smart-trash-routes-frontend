@@ -11,7 +11,9 @@ import {
   moon, 
   sunny,
   closeOutline,
-  person
+  person,
+  helpCircleOutline,
+  informationCircleOutline
 } from 'ionicons/icons';
 import {
   IonApp,
@@ -64,7 +66,9 @@ export class AppComponent {
       moon,
       sunny,
       closeOutline,
-      person
+      person,
+      helpCircleOutline,
+      informationCircleOutline
     });
     this.initializeApp();
   }

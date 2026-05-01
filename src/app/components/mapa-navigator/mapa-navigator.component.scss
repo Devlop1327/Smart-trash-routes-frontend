@@ -16,6 +16,7 @@
   .mapa {
     width: 100%;
     height: 100%;
+    touch-action: none; /* Permite arrastrar con 1 dedo en móviles */
   }
 }
 

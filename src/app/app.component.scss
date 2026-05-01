@@ -122,8 +122,8 @@ ion-menu.premium-menu {
     gap: 14px;
     .theme-icon { font-size: 28px; color: #fbbf24; }
     .theme-texts {
-      .theme-title { font-size: 15px; font-weight: 800; color: #1e293b; }
-      .theme-status { font-size: 12px; color: #94a3b8; font-weight: 600; }
+      .theme-title { font-size: 15px; font-weight: 800; color: #001D39; }
+      .theme-status { font-size: 12px; color: #475569; font-weight: 700; }
     }
   }
 }
@@ -143,41 +143,67 @@ ion-menu.premium-menu {
   &.active { background: #10b981; .toggle-thumb { transform: translateX(24px); } }
 }
 
-.version-tag { text-align: center; margin-top: 20px; font-size: 11px; color: #cbd5e1; font-weight: 700; letter-spacing: 1px; }
+.version-tag { 
+  text-align: center; 
+  margin-top: 20px; 
+  font-size: 11px; 
+  color: #64748b; /* Más oscuro para mejor contraste */
+  font-weight: 800; 
+  letter-spacing: 1px; 
+}
 
 /* ============================================
-   MODO OSCURO - PALETA NAVY (Screenshot 2)
+   MODO OSCURO - PALETA NAVY (Actualizada)
    ============================================ */
 [data-theme='dark'] {
   ion-menu.premium-menu {
-    --background: linear-gradient(to bottom, #083d6a 0%, #2e6ea5 100%);
+    --background: linear-gradient(to bottom, #001D39 0%, #001D39 55%, #BDD8E9 88%, #FFFFFF 100%);
+  }
+  
+  ion-toolbar.menu-toolbar {
+    --background: transparent;
+    --color: white; /* Texto claro sobre la zona oscura superior */
   }
 
   .menu-content-std {
-    background: linear-gradient(to bottom, #083d6a 0%, #2e6ea5 100%);
+    background: transparent;
     color: white;
   }
 
   .menu-profile-card {
-    background: transparent; /* Permite ver el gradiente */
-    .avatar-wrapper { background: rgba(255, 255, 255, 0.1); ion-icon { color: white; } }
-    .user-greeting { color: rgba(255, 255, 255, 0.5); }
+    background: transparent;
+    .avatar-wrapper { background: rgba(255, 255, 255, 0.15); ion-icon { color: white; } }
+    .user-greeting { color: rgba(255, 255, 255, 0.7); }
     .user-name { color: white; }
   }
 
-  .menu-separator { background: rgba(255, 255, 255, 0.05); }
+  .menu-separator { background: rgba(255, 255, 255, 0.1); }
 
   .nav-item {
-    color: rgba(255, 255, 255, 0.6);
-    .icon-box { background: rgba(255, 255, 255, 0.05); ion-icon { color: rgba(255, 255, 255, 0.6); } }
+    color: rgba(255, 255, 255, 0.7);
+    .icon-box { background: rgba(255, 255, 255, 0.08); ion-icon { color: rgba(255, 255, 255, 0.8); } }
     
     &.active-item {
-      background: rgba(16, 185, 129, 0.15);
-      color: #10b981;
-      .icon-box { background: #10b981; ion-icon { color: white; } }
+      background: rgba(123, 189, 232, 0.2);
+      color: #7BBDE8;
+      .icon-box { background: #7BBDE8; ion-icon { color: #001D39; } }
     }
   }
 
-  .menu-footer-std { background: transparent; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-  .theme-card-std { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-color: rgba(255, 255, 255, 0.1); .theme-title { color: white; } }
+  /* Footer en la zona clara inferior */
+  .menu-footer-std { background: transparent; border-top: 1px solid rgba(0, 29, 57, 0.1); }
+  .theme-card-std { 
+    background: rgba(0, 29, 57, 0.08); 
+    backdrop-filter: blur(10px); 
+    border-color: rgba(0, 29, 57, 0.2); 
+    .theme-title { color: #001D39; font-weight: 900; } 
+    .theme-status { color: #001D39; font-weight: 800; opacity: 0.8; }
+  }
+  
+  .toggle-track {
+    background: rgba(0, 29, 57, 0.15);
+    &.active { background: #0A4174; } /* Azul más fuerte para el toggle activo en zona clara */
+  }
+  
+  .version-tag { color: #001D39; font-weight: 800; }
 }

@@ -134,7 +134,30 @@
   margin-bottom: 16px;
   
   .section-title-std { font-size: 18px; font-weight: 800; margin: 0; color: #1e293b; }
-  .text-btn { background: none; border: none; color: #059669; font-weight: 700; font-size: 14px; }
+  
+  .change-route-chip {
+    background: #ecfdf5;
+    border: 1px solid #d1fae5;
+    color: #059669;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.05);
+
+    &:active {
+      background: #d1fae5;
+      transform: scale(0.95);
+    }
+
+    ion-icon {
+      font-size: 16px;
+    }
+  }
 }
 
 .tracking-card-std {
@@ -271,21 +294,86 @@
 
 :host-context(.dark) .standard-dashboard,
 :host-context([data-theme='dark']) .standard-dashboard {
-  background: linear-gradient(to bottom, #083d6a 0%, #2e6ea5 100%);
+  background: linear-gradient(to bottom, #001D39 0%, #001D39 55%, #BDD8E9 88%, #FFFFFF 100%);
   color: #f8fafc;
   
-  .custom-header { background: transparent; border-color: rgba(255, 255, 255, 0.1); }
-  .header-title { color: #34d399; }
-  .menu-btn, .notif-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); ion-icon { color: white; } }
+  .custom-header { 
+    background: transparent; 
+    border-color: rgba(255, 255, 255, 0.1); 
+    .header-title { color: white; } 
+  }
+
+  .menu-btn, .notif-btn { 
+    background: rgba(255, 255, 255, 0.08); 
+    backdrop-filter: blur(10px); 
+    ion-icon { color: white; } 
+  }
   
   .native-card {
-    &.map-card-bg { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-color: rgba(255, 255, 255, 0.1); }
-    &.routes-card-bg { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-color: rgba(255, 255, 255, 0.1); }
+    &.map-card-bg, &.routes-card-bg { 
+      background: rgba(0, 29, 57, 0.85); /* Mucho más opaco para contraste sobre blanco */
+      backdrop-filter: blur(20px); 
+      border-color: rgba(255, 255, 255, 0.1); 
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
     .card-title { color: white; }
-    .card-subtitle { color: rgba(255, 255, 255, 0.6); }
+    .card-subtitle { color: rgba(255, 255, 255, 0.7); }
+    .card-icon-circle { 
+      background: rgba(123, 189, 232, 0.15); 
+      ion-icon { color: #7BBDE8; } 
+    }
+    .arrow-icon { color: rgba(255, 255, 255, 0.3); }
+  }
+
+  .tracking-card-std {
+    background: #001D39; /* Sólido para máxima visibilidad en zona clara */
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(123, 189, 232, 0.3);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    
+    .status-indicator {
+      background: rgba(123, 189, 232, 0.15);
+      .pulse-dot { background: #7BBDE8; box-shadow: 0 0 10px rgba(123, 189, 232, 0.5); }
+      .status-text { color: #7BBDE8; }
+    }
+    
+    .countdown-circle {
+      border-color: #7BBDE8;
+      color: #7BBDE8;
+    }
   }
   
   .welcome-msg { color: rgba(255, 255, 255, 0.7); }
   .section-title-std { color: white; }
-  .day-box-std { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-color: rgba(255, 255, 255, 0.1); .day-n { color: rgba(255, 255, 255, 0.5); } .day-d { color: white; } }
+  
+  .change-route-chip {
+    background: rgba(123, 189, 232, 0.1);
+    border-color: rgba(123, 189, 232, 0.2);
+    color: #7BBDE8;
+    
+    &:active {
+      background: rgba(123, 189, 232, 0.2);
+    }
+  }
+
+  .day-box-std { 
+    background: rgba(10, 65, 116, 0.5); /* Color más fuerte/opaco */
+    backdrop-filter: blur(15px); 
+    border-color: rgba(255, 255, 255, 0.1); 
+    
+    .day-n { color: rgba(255, 255, 255, 0.8); } 
+    .day-d { color: white; }
+    
+    &.is-today { 
+      border: 2px solid #7BBDE8; 
+      background: rgba(10, 65, 116, 0.8); 
+    }
+    &.is-selected { 
+      background: #7BBDE8; 
+      color: #001D39; 
+      border-color: #7BBDE8; 
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      .day-n { color: #001D39; font-weight: 800; } 
+    }
+  }
 }

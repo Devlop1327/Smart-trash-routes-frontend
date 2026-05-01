@@ -70,11 +70,20 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px;
+  gap: 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:active {
+    background: rgba(0, 0, 0, 0.02);
+  }
 
   .setting-info {
     display: flex;
     align-items: center;
     gap: 16px;
+    flex: 1;
+    min-width: 0;
 
     .icon-circle {
       width: 40px;
@@ -83,6 +92,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
       
       ion-icon { font-size: 20px; color: white; }
       
@@ -94,9 +104,37 @@
     .texts {
       display: flex;
       flex-direction: column;
-      .title { font-size: 16px; font-weight: 700; color: #1e293b; }
+      min-width: 0;
+      .title { font-size: 16px; font-weight: 700; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .subtitle { font-size: 12px; color: #94a3b8; font-weight: 500; }
     }
+  }
+}
+
+.toggle-track {
+  width: 52px;
+  height: 28px;
+  background: #e2e8f0;
+  border-radius: 50px;
+  position: relative;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+
+  .toggle-thumb {
+    width: 22px; 
+    height: 22px; 
+    background: white; 
+    border-radius: 50%;
+    position: absolute; 
+    top: 3px; 
+    left: 3px; 
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  &.active { 
+    background: #10b981; 
+    .toggle-thumb { transform: translateX(24px); } 
   }
 }
 
@@ -121,22 +159,44 @@
    ============================================ */
 :host-context(.dark) .standard-dashboard,
 :host-context([data-theme='dark']) .standard-dashboard {
-  background: linear-gradient(to bottom, #083d6a 0%, #2e6ea5 100%);
+  background: linear-gradient(to bottom, #001D39 0%, #001D39 55%, #BDD8E9 88%, #FFFFFF 100%);
   color: white;
 
-  .custom-header { background: transparent; border-color: rgba(255, 255, 255, 0.1); .header-title { color: #34d399; } }
-  .menu-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); ion-icon { color: white; } }
+  .custom-header { 
+    background: transparent; 
+    border-color: rgba(255, 255, 255, 0.1); 
+    .header-title { color: white; } 
+  }
   
-  .section-title-std { color: rgba(255, 255, 255, 0.6); }
+  .menu-btn { 
+    background: rgba(255, 255, 255, 0.08); 
+    backdrop-filter: blur(10px); 
+    ion-icon { color: white; } 
+  }
+  
+  .section-title-std { color: rgba(255, 255, 255, 0.7); }
 
   .premium-card-settings {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(10, 65, 116, 0.4); // #0A4174 with transparency
+    backdrop-filter: blur(20px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     
-    .title { color: white; }
+    .texts .title { color: white; }
+    .texts .subtitle { color: rgba(255, 255, 255, 0.6); }
     .label { color: rgba(255, 255, 255, 0.6); }
     .value { color: white; }
-    .divider { background: rgba(255, 255, 255, 0.05); }
+    .divider { background: rgba(255, 255, 255, 0.1); }
+    
+    .toggle-track {
+      background: rgba(255, 255, 255, 0.2);
+      &.active { background: #7BBDE8; }
+    }
+
+    .icon-circle {
+      &.color-theme { background: #BDD8E9; ion-icon { color: #001D39; } }
+      &.color-notif { background: #49769F; }
+      &.color-gps { background: #4E8EA2; }
+    }
   }
 }

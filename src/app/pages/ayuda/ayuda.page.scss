@@ -1,0 +1,183 @@
+.standard-dashboard {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+  color: #1e293b;
+  overflow: hidden;
+}
+
+.custom-header {
+  background: #ffffff;
+  padding: calc(32px + var(--ion-safe-area-top)) 20px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .header-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0;
+      color: #059669;
+    }
+    
+    .menu-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      ion-icon { font-size: 24px; color: #1e293b; }
+    }
+  }
+}
+
+.dashboard-content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px 20px;
+}
+
+.ayuda-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.help-intro {
+  text-align: center;
+  margin-bottom: 32px;
+  
+  .icon-circle-large {
+    width: 80px;
+    height: 80px;
+    background: #ecfdf5;
+    color: #059669;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    ion-icon { font-size: 40px; }
+  }
+  
+  h2 { font-size: 24px; font-weight: 800; color: #1e293b; margin: 0 0 8px; }
+  p { font-size: 14px; color: #64748b; margin: 0; }
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.faq-card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  
+  &.is-open { border-color: #059669; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05); }
+
+  .faq-header {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    
+    .faq-icon-box {
+      width: 36px;
+      height: 36px;
+      background: #f1f5f9;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      ion-icon { font-size: 20px; color: #64748b; }
+    }
+    
+    .faq-question { flex: 1; font-size: 15px; font-weight: 700; color: #1e293b; }
+    .arrow { color: #cbd5e1; font-size: 20px; }
+  }
+  
+  .faq-body {
+    padding: 0 16px 20px 64px;
+    p { font-size: 14px; color: #64748b; line-height: 1.5; margin: 0; }
+  }
+}
+
+.tips-section {
+  h3 { font-size: 18px; font-weight: 800; color: #1e293b; margin: 0 0 16px; }
+}
+
+.tip-banner {
+  background: linear-gradient(135deg, #059669, #047857);
+  color: white;
+  padding: 24px;
+  border-radius: 24px;
+  display: flex;
+  gap: 16px;
+  box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3);
+  
+  .tip-icon { font-size: 32px; }
+  .tip-content {
+    strong { font-size: 16px; display: block; margin-bottom: 4px; }
+    p { font-size: 13px; margin: 0; opacity: 0.9; line-height: 1.4; }
+  }
+}
+
+/* ============================================
+   MODO OSCURO - PALETA NAVY
+   ============================================ */
+:host-context(.dark) .standard-dashboard,
+:host-context([data-theme='dark']) .standard-dashboard {
+  background: linear-gradient(to bottom, #001D39 0%, #001D39 55%, #BDD8E9 88%, #FFFFFF 100%);
+  color: white;
+
+  .custom-header { 
+    background: transparent; 
+    border-color: rgba(255, 255, 255, 0.1); 
+    .header-title { color: white; } 
+  }
+  
+  .menu-btn { 
+    background: rgba(255, 255, 255, 0.08); 
+    backdrop-filter: blur(10px); 
+    ion-icon { color: white; } 
+  }
+  
+  .help-intro {
+    .icon-circle-large { background: rgba(123, 189, 232, 0.1); color: #7BBDE8; }
+    h2 { color: white; }
+    p { color: rgba(255, 255, 255, 0.7); }
+  }
+
+  .faq-card {
+    background: rgba(10, 65, 116, 0.4);
+    backdrop-filter: blur(10px);
+    border-color: rgba(255, 255, 255, 0.1);
+    
+    &.is-open { border-color: #7BBDE8; }
+    
+    .faq-header {
+      .faq-icon-box { background: rgba(255, 255, 255, 0.1); ion-icon { color: #7BBDE8; } }
+      .faq-question { color: white; }
+    }
+    .faq-body p { color: rgba(255, 255, 255, 0.7); }
+  }
+
+  .tips-section h3 { color: white; }
+  
+  .tip-banner {
+    background: linear-gradient(135deg, #7BBDE8, #0A4174);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  }
+}

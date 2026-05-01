@@ -33,9 +33,10 @@
 
 :host-context(.dark) .glass-card,
 :host-context([data-theme='dark']) .glass-card {
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  background: rgba(0, 29, 57, 0.85); /* Más oscuro y opaco */
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }
 
 .card-header {
@@ -57,9 +58,9 @@
       color: white;
     }
     
-    &.color-primary { background: linear-gradient(135deg, #059669, #047857); box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); }
-    &.color-secondary { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
-    &.color-tertiary { background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); }
+    &.color-primary { background: linear-gradient(135deg, #7BBDE8, #49769F); box-shadow: 0 4px 12px rgba(123, 189, 232, 0.3); }
+    &.color-secondary { background: linear-gradient(135deg, #4E8EA2, #0A4174); box-shadow: 0 4px 12px rgba(78, 142, 162, 0.3); }
+    &.color-tertiary { background: linear-gradient(135deg, #6EA2B3, #49769F); box-shadow: 0 4px 12px rgba(110, 162, 179, 0.3); }
   }
   
   h3 {
@@ -124,25 +125,18 @@
       }
     }
 
-    .custom-ion-select {
-      --padding-start: 0;
-      --padding-end: 0;
-      --padding-top: 4px;
-      --padding-bottom: 4px;
+    .native-select-fallback {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 8px 0;
       font-size: 16px;
       font-weight: 600;
       color: #1e293b;
-      min-height: auto;
-      
-      &::part(placeholder), &::part(text) {
-        color: #1e293b;
-      }
-
-      &::part(icon) {
-        color: #059669;
-        opacity: 1;
-        font-size: 16px;
-      }
+      appearance: none;
+      cursor: pointer;
+      font-family: inherit;
+      outline: none;
     }
   }
 }
@@ -157,23 +151,31 @@
 
 :host-context(.dark) .input-wrapper,
 :host-context([data-theme='dark']) .input-wrapper {
-  background: #0f172a;
-  border-color: #1e293b;
+  background: rgba(0, 29, 57, 0.3); // #001D39
+  border-color: rgba(123, 189, 232, 0.2); // #7BBDE8
+  
+  &:focus-within {
+    border-color: #7BBDE8;
+    background: rgba(0, 29, 57, 0.5);
+    box-shadow: 0 0 0 4px rgba(123, 189, 232, 0.1);
+  }
+
+  ion-icon { color: #7BBDE8; }
   
   .field-content {
-    label { color: #94a3b8; }
-    input, textarea, select {
-      color: #f8fafc;
-      &::placeholder { color: #475569; }
+    label { color: #BDD8E9; } // #BDD8E9
+    input, textarea, select, .native-select-fallback {
+      color: #f8fafc !important;
+      &::placeholder { color: #49769F; }
     }
   }
 }
 
 // Photo Upload
 .photo-dropzone {
-  border: 2px dashed rgba(5, 150, 105, 0.3);
+  border: 2px dashed rgba(123, 189, 232, 0.3);
   border-radius: 20px;
-  background: rgba(5, 150, 105, 0.02);
+  background: rgba(123, 189, 232, 0.02);
   padding: 40px 20px;
   text-align: center;
   cursor: pointer;
@@ -191,7 +193,7 @@
     
     ion-icon {
       font-size: 48px;
-      color: #059669;
+      color: #7BBDE8;
       margin-bottom: 12px;
     }
     
@@ -272,9 +274,9 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  background: rgba(245, 158, 11, 0.1);
-  color: #d97706;
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: rgba(123, 189, 232, 0.1);
+  color: #7BBDE8;
+  border: 1px solid rgba(123, 189, 232, 0.2);
   padding: 16px;
   border-radius: 16px;
   font-size: 15px;
@@ -311,7 +313,7 @@
     
     ion-icon {
       font-size: 24px;
-      color: #d97706;
+      color: #7BBDE8;
     }
   }
   
@@ -350,7 +352,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, #059669, #047857);
+  background: linear-gradient(135deg, #7BBDE8, #0A4174);
   color: white;
   border: none;
   padding: 0 24px;
@@ -358,7 +360,7 @@
   border-radius: 20px;
   font-size: 18px;
   font-weight: 700;
-  box-shadow: 0 10px 25px rgba(5, 150, 105, 0.4);
+  box-shadow: 0 10px 25px rgba(10, 65, 116, 0.4);
   transition: all 0.3s ease;
   
   ion-icon {
@@ -367,13 +369,13 @@
   
   &:active:not(.disabled) {
     transform: scale(0.97);
-    box-shadow: 0 5px 15px rgba(5, 150, 105, 0.3);
+    box-shadow: 0 5px 15px rgba(10, 65, 116, 0.3);
   }
   
   &.disabled {
-    background: var(--ion-color-step-200);
+    background: rgba(255, 255, 255, 0.1);
     box-shadow: none;
-    color: var(--ion-color-step-500);
+    color: rgba(255, 255, 255, 0.3);
     opacity: 0.7;
     cursor: not-allowed;
   }

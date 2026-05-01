@@ -49,9 +49,17 @@
    ============================================ */
 :host-context(.dark) .standard-dashboard,
 :host-context([data-theme='dark']) .standard-dashboard {
-  background: linear-gradient(to bottom, #083d6a 0%, #2e6ea5 100%);
+  background: linear-gradient(to bottom, #001D39 0%, #001D39 55%, #BDD8E9 88%, #FFFFFF 100%);
   color: white;
 
-  .custom-header { background: transparent; border-color: rgba(255, 255, 255, 0.1); .header-title { color: #34d399; } }
-  .menu-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); ion-icon { color: white; } }
+  .custom-header { 
+    background: transparent; 
+    border-color: rgba(255, 255, 255, 0.1); 
+    .header-title { color: white; } 
+  }
+  .menu-btn { 
+    background: rgba(255, 255, 255, 0.08); 
+    backdrop-filter: blur(10px); 
+    ion-icon { color: white; } 
+  }
 }

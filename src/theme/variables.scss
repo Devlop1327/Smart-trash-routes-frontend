@@ -12,17 +12,17 @@
 
   // ECOX DARK (Premium Dark Mode)
   &[data-theme='dark'] {
-    --ecox-bg: #0f172a;
-    --ecox-card: #1e293b;
-    --ecox-accent: #34d399; // Emerald 400
-    --ecox-secondary: #94a3b8; // Slate 400
+    --ecox-bg: #001D39; // Deep Navy
+    --ecox-card: #0A4174; // Dark Blue
+    --ecox-accent: #7BBDE8; // Sky Blue
+    --ecox-secondary: #49769F; // Muted Blue
     --ion-text-color: #f8fafc;
     
     --ion-color-primary: var(--ecox-accent);
     --ion-background-color: var(--ecox-bg);
-    --ion-color-step-50: #1e293b;
-    --ion-color-step-100: #334155;
-    --ion-color-step-200: #475569;
+    --ion-color-step-50: #0A4174;
+    --ion-color-step-100: #1a4d7a;
+    --ion-color-step-200: #2a5a81;
 
     // Overlays fix
     --ion-overlay-background-color: var(--ecox-card);

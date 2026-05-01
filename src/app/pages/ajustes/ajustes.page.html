@@ -17,7 +17,7 @@
       <h2 class="section-title-std">Preferencias</h2>
       
       <div class="premium-card-settings">
-        <div class="setting-item">
+        <div class="setting-item" (click)="toggleTheme(); $event.stopPropagation()">
           <div class="setting-info">
             <div class="icon-circle color-theme">
               <ion-icon [name]="isDark() ? 'moon' : 'sunny'"></ion-icon>
@@ -27,12 +27,14 @@
               <span class="subtitle">Cambia entre tema claro y oscuro</span>
             </div>
           </div>
-          <ion-toggle [checked]="isDark()" (click)="toggleTheme(); $event.stopPropagation()"></ion-toggle>
+          <div class="toggle-track" [class.active]="isDark()">
+            <div class="toggle-thumb"></div>
+          </div>
         </div>
 
         <div class="divider"></div>
 
-        <div class="setting-item">
+        <div class="setting-item" (click)="toggleNotifications()">
           <div class="setting-info">
             <div class="icon-circle color-notif">
               <ion-icon name="notifications-outline"></ion-icon>
@@ -42,12 +44,14 @@
               <span class="subtitle">Recibe avisos de recolección</span>
             </div>
           </div>
-          <ion-toggle [checked]="true"></ion-toggle>
+          <div class="toggle-track" [class.active]="notificationsActive()">
+            <div class="toggle-thumb"></div>
+          </div>
         </div>
 
         <div class="divider"></div>
 
-        <div class="setting-item">
+        <div class="setting-item" (click)="toggleGpsAlways()">
           <div class="setting-info">
             <div class="icon-circle color-gps">
               <ion-icon name="navigate-outline"></ion-icon>
@@ -57,7 +61,9 @@
               <span class="subtitle">Seguimiento en tiempo real</span>
             </div>
           </div>
-          <ion-toggle [checked]="gpsAlwaysActive()" (ionChange)="toggleGpsAlways()"></ion-toggle>
+          <div class="toggle-track" [class.active]="gpsAlwaysActive()">
+            <div class="toggle-thumb"></div>
+          </div>
         </div>
       </div>
     </div>

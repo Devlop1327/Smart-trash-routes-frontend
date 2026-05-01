@@ -27,6 +27,16 @@ export const routes: Routes = [
       import('./pages/ajustes/ajustes.page').then((m) => m.AjustesPage),
   },
   {
+    path: 'acerca-de',
+    loadComponent: () =>
+      import('./pages/acerca-de/acerca-de.page').then((m) => m.AcercaDePage),
+  },
+  {
+    path: 'ayuda',
+    loadComponent: () =>
+      import('./pages/ayuda/ayuda.page').then((m) => m.AyudaPage),
+  },
+  {
     path: '',
     redirectTo: '/dashboard',
     pathMatch: 'full',

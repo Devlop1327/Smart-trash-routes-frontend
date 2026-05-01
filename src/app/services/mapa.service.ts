@@ -9,6 +9,7 @@ import { fromLonLat, toLonLat, transformExtent } from 'ol/proj';
 import { Geolocation } from '@capacitor/geolocation';
 import { Zoom } from 'ol/control';
 import { GeoJSON } from 'ol/format';
+import { defaults as defaultInteractions, DragPan, MouseWheelZoom } from 'ol/interaction';
 import { RutasService, Ruta } from './rutas.service';
 
 export enum TipoResiduo {
@@ -73,6 +74,17 @@ export class MapaService {
           source: new OSM()
         })
       ],
+      interactions: defaultInteractions({
+        dragPan: false, // Desactivamos el por defecto para poner el nuestro
+        mouseWheelZoom: false
+      }).extend([
+        new DragPan({
+          condition: (event) => true, // Permitir siempre
+        }),
+        new MouseWheelZoom({
+          duration: 250
+        })
+      ]),
       controls: [
         new Zoom({
           className: 'ol-zoom ecox-zoom'
