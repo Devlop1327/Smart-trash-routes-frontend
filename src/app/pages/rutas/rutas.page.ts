@@ -4,6 +4,8 @@ import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { RutasService, Ruta } from '../../services/rutas.service';
 import { MapaService } from '../../services/mapa.service';
+import { addIcons } from 'ionicons';
+import { navigate, chevronForward, alertCircle, mapOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-rutas',
@@ -16,6 +18,10 @@ export class RutasPage implements OnInit {
   private rutasService = inject(RutasService);
   private mapaService = inject(MapaService);
   private router = inject(Router);
+
+  constructor() {
+    addIcons({ navigate, chevronForward, alertCircle, mapOutline });
+  }
 
   rutas: Ruta[] = [];
   cargando = true;

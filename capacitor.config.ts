@@ -4,6 +4,11 @@ const config: CapacitorConfig = {
   appId: 'com.smarttrash.routes',
   appName: 'Smart Trash Routes',
   webDir: 'www',
+  plugins: {
+    CapacitorHttp: {
+      enabled: true,
+    },
+  },
 };
 
 export default config;

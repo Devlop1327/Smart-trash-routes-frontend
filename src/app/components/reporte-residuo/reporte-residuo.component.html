@@ -41,11 +41,11 @@
           <ion-icon name="pricetag-outline"></ion-icon>
           <div class="field-content">
             <label>Tipo de Residuo</label>
-            <select formControlName="tipo" class="native-select-fallback">
-              @for (tipo of tiposResiduo; track tipo.value) {
-                <option [value]="tipo.value">{{ tipo.label }}</option>
-              }
-            </select>
+            <ion-select formControlName="tipo" label-placement="none" interface="action-sheet" class="custom-ion-select">
+              <ion-select-option *ngFor="let tipo of tiposResiduo" [value]="tipo.value">
+                {{ tipo.label }}
+              </ion-select-option>
+            </ion-select>
           </div>
         </div>
 
@@ -84,19 +84,28 @@
       
       <div class="photo-container">
         @if (imagenPreview()) {
-          <div class="photo-preview zoom-in" (click)="gestionarFoto()">
+          <div class="photo-preview zoom-in" (click)="mostrarOpcionesFoto.set(!mostrarOpcionesFoto())">
             <img [src]="imagenPreview()" alt="Preview" />
-            <div class="photo-overlay-edit">
-              <ion-icon name="create-outline"></ion-icon>
-              <span>Toca para editar</span>
+            <div class="photo-actions-overlay" [class.visible]="mostrarOpcionesFoto()">
+              <button type="button" class="action-btn delete" (click)="eliminarFoto(); $event.stopPropagation()">
+                <ion-icon name="trash-outline"></ion-icon>
+                <span>Eliminar</span>
+              </button>
+              <button type="button" class="action-btn repeat" (click)="tomarFoto(); $event.stopPropagation()">
+                <ion-icon name="refresh-outline"></ion-icon>
+                <span>Repetir</span>
+              </button>
+              <button type="button" class="action-btn done" (click)="mostrarOpcionesFoto.set(false); $event.stopPropagation()">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+                <span>Listo</span>
+              </button>
             </div>
           </div>
         } @else {
           <div class="photo-dropzone" (click)="tomarFoto()">
             <div class="dropzone-content">
-              <ion-icon name="image-outline"></ion-icon>
-              <span class="title">Añadir fotografía</span>
-              <span class="subtitle">Toca para abrir la cámara o galería</span>
+              <ion-icon name="camera-outline"></ion-icon>
+              <span class="title">Adjuntar Evidencia (Foto)</span>
             </div>
           </div>
         }

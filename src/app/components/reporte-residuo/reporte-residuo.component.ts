@@ -1,23 +1,29 @@
 import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { 
+  IonIcon, 
+  IonSelect, 
+  IonSelectOption,
+  ToastController 
+} from '@ionic/angular/standalone';
 import { FormBuilder, ReactiveFormsModule, FormGroup, Validators } from '@angular/forms';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
-import { ActionSheetController, ToastController } from '@ionic/angular';
 import { HttpClient } from '@angular/common/http';
 import { TipoResiduo } from '../../services/mapa.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-reporte-residuo',
   standalone: true,
-  imports: [CommonModule, IonicModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, IonIcon, IonSelect, IonSelectOption],
   templateUrl: './reporte-residuo.component.html',
   styleUrls: ['./reporte-residuo.component.scss']
 })
 export class ReporteResiduoComponent {
   reporteForm: FormGroup;
   imagenPreview = signal<string | null>(null);
+  mostrarOpcionesFoto = signal(false);
 
   tiposResiduo = [
     { value: TipoResiduo.PLASTICO, label: 'Plástico' },
@@ -29,7 +35,6 @@ export class ReporteResiduoComponent {
 
   constructor(
     private fb: FormBuilder, 
-    private actionSheetCtrl: ActionSheetController,
     private toastCtrl: ToastController,
     private http: HttpClient
   ) {
@@ -45,10 +50,15 @@ export class ReporteResiduoComponent {
   async tomarFoto() {
     try {
       const image = await Camera.getPhoto({
-        quality: 80,
-        allowEditing: true,
+        quality: 60,
+        width: 800,
+        allowEditing: false,
         resultType: CameraResultType.DataUrl,
-        source: CameraSource.Camera
+        source: CameraSource.Prompt,
+        promptLabelHeader: 'Evidencia Fotográfica',
+        promptLabelCancel: 'Cancelar',
+        promptLabelPhoto: 'Elegir de la galería',
+        promptLabelPicture: 'Tomar foto'
       });
 
       this.imagenPreview.set(image.dataUrl || null);
@@ -61,34 +71,6 @@ export class ReporteResiduoComponent {
     this.imagenPreview.set(null);
   }
 
-  async gestionarFoto() {
-    const actionSheet = await this.actionSheetCtrl.create({
-      header: 'Gestionar Foto',
-      buttons: [
-        {
-          text: 'Tomar nueva foto',
-          icon: 'camera',
-          handler: () => {
-            this.tomarFoto();
-          }
-        },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          icon: 'trash',
-          handler: () => {
-            this.eliminarFoto();
-          }
-        },
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          icon: 'close'
-        }
-      ]
-    });
-    await actionSheet.present();
-  }
   async enviarReporte() {
     if (!this.reporteForm.valid) {
       return;
@@ -113,7 +95,7 @@ export class ReporteResiduoComponent {
     console.log('Enviando reporte...', formData);
     
     // Enviar a la API
-    this.http.post('http://localhost:8000/reportes', formData).subscribe({
+    this.http.post(`${environment.apiUrl}/reportes`, formData).subscribe({
       next: async (res) => {
         const toast = await this.toastCtrl.create({
           message: 'Reporte enviado con éxito. ¡Gracias por tu colaboración!',

@@ -33,6 +33,64 @@
 
 :host ::ng-deep {
   .ol-zoom {
-    display: none !important; // Hidden to use custom controls in the page
+    top: auto !important;
+    bottom: 120px !important;
+    right: 16px !important;
+    left: auto !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px);
+    border-radius: 16px !important;
+    padding: 4px !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    display: flex !important;
+    flex-direction: column;
+    gap: 4px;
+
+    button {
+      background: #f8fafc !important;
+      color: #059669 !important;
+      font-size: 20px !important;
+      font-weight: 800 !important;
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 12px !important;
+      margin: 0 !important;
+      border: none !important;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #f1f5f9 !important;
+        transform: scale(1.05);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      &.ol-zoom-in {
+        margin-bottom: 2px !important;
+      }
+    }
+  }
+}
+
+/* Estilos de zoom para modo oscuro */
+:host-context([data-theme='dark']) ::ng-deep .ol-zoom,
+:host-context(.dark) ::ng-deep .ol-zoom {
+  background: rgba(10, 65, 116, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  
+  button {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #7BBDE8 !important;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.2) !important;
+    }
   }
 }
