@@ -58,4 +58,20 @@ export class RutasService {
         })
       );
   }
+
+  /**
+   * GET /api/publico/rutas/activas - Obtener asignaciones activas (en curso)
+   */
+  obtenerAsignacionesActivas(): Observable<any[]> {
+    // environment.apiUrl ya termina en '/api'
+    return this.http
+      .get<any>(`${environment.apiUrl}/publico/rutas/activas`)
+      .pipe(
+        map((res) => {
+          if (res && res.data) return res.data;
+          if (Array.isArray(res)) return res;
+          return [];
+        })
+      );
+  }
 }

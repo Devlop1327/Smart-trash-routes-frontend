@@ -1,5 +1,5 @@
 import { Injectable, signal, inject } from '@angular/core';
-import { Map, View } from 'ol';
+import { Map, View, Overlay } from 'ol';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
 import { OSM, Vector as VectorSource } from 'ol/source';
 import { Feature } from 'ol';
@@ -11,6 +11,7 @@ import { Zoom } from 'ol/control';
 import { GeoJSON } from 'ol/format';
 import { defaults as defaultInteractions, DragPan, MouseWheelZoom } from 'ol/interaction';
 import { RutasService, Ruta } from './rutas.service';
+import { environment } from '../../environments/environment';
 
 export enum TipoResiduo {
   PLASTICO = 'plastico',
@@ -49,6 +50,11 @@ export class MapaService {
   private rutaActual = signal<RutaUsuario | null>(null);
   private rutasAdmin = signal<Ruta[]>([]);
   private rutaAdminSeleccionada = signal<Ruta | null>(null);
+
+  private capaCamiones: VectorLayer | null = null;
+  private popupOverlay: any = null;
+  private camionesFeatures: globalThis.Map<number, Feature> = new globalThis.Map();
+  private websockets: globalThis.Map<number, WebSocket> = new globalThis.Map();
 
   readonly posicionUsuarioSignal = this.posicionUsuario.asReadonly();
   readonly puntosRecogidaSignal = this.puntosRecogida.asReadonly();
@@ -101,10 +107,23 @@ export class MapaService {
 
     this.obtenerPosicionActual();
     this.cargarCallesBuenaventura();
+    this.iniciarCapaCamiones();
+    this.iniciarPopup();
+    this.iniciarRastreoCamiones();
     
     setTimeout(() => {
       this.mapa?.updateSize();
     }, 200);
+
+    // Listener de clics para el popup
+    this.mapa?.on('click', (evt) => {
+      const feature = this.mapa?.forEachFeatureAtPixel(evt.pixel, (f) => f);
+      if (feature && feature.get('type') === 'camion') {
+        this.mostrarPopupCamion(feature, evt.coordinate);
+      } else {
+        this.ocultarPopup();
+      }
+    });
 
     return this.mapa;
   }
@@ -586,6 +605,223 @@ export class MapaService {
   toggleRutasAdmin(visible: boolean): void {
     if (this.capaRutasAdmin) {
       this.capaRutasAdmin.setVisible(visible);
+    }
+  }
+
+  // ==================== RASTREO DE CAMIONES EN VIVO ====================
+
+  private iniciarCapaCamiones(): void {
+    if (!this.mapa) return;
+
+    this.capaCamiones = new VectorLayer({
+      source: new VectorSource(),
+      properties: { name: 'camiones-activos' },
+      zIndex: 25 // Por encima de todo
+    });
+
+    this.mapa.addLayer(this.capaCamiones);
+  }
+
+  private iniciarRastreoCamiones(): void {
+    // Primera carga
+    this.consultarAsignacionesActivas();
+
+    // Polling cada 30 segundos para detectar nuevos camiones en ruta
+    setInterval(() => {
+      this.consultarAsignacionesActivas();
+    }, 30000);
+  }
+
+  private consultarAsignacionesActivas(): void {
+    this.rutasService.obtenerAsignacionesActivas().subscribe({
+      next: (asignaciones) => {
+        asignaciones.forEach(asig => {
+          this.conectarWebSocketCamion(asig.id_asignacion);
+        });
+      },
+      error: (err) => console.error('Error obteniendo asignaciones activas:', err)
+    });
+  }
+
+  private conectarWebSocketCamion(idAsignacion: number): void {
+    if (this.websockets.has(idAsignacion)) return;
+
+    console.log(`[Rastreo] Intentando conectar WebSocket para asignación ${idAsignacion}`);
+
+    let wsUrl = environment.apiUrl.replace('http://', 'ws://').replace('https://', 'wss://');
+    wsUrl = wsUrl.replace('/api', '');
+    
+    const finalWsUrl = `${wsUrl}/ws/public/asignacion/${idAsignacion}`;
+    console.log(`[Rastreo] URL WebSocket: ${finalWsUrl}`);
+
+    const ws = new WebSocket(finalWsUrl);
+
+    ws.onopen = () => {
+      console.log(`[Rastreo] ✅ Conectado exitosamente al camión ${idAsignacion}`);
+    };
+
+    ws.onmessage = (event) => {
+      console.log(`[Rastreo] 📩 Mensaje recibido para ${idAsignacion}:`, event.data);
+      try {
+        const data = JSON.parse(event.data);
+        if (data.evento === 'posicion_actualizada') {
+          const lat = data.latitud !== undefined ? data.latitud : (data.data && data.data.lat);
+          const lon = data.longitud !== undefined ? data.longitud : (data.data && data.data.lon);
+
+          if (lat && lon) {
+            console.log(`[Rastreo] 📍 Actualizando posición: ${lat}, ${lon}`);
+            this.actualizarPosicionCamion(idAsignacion, parseFloat(lon), parseFloat(lat), data.id_ruta);
+          } else {
+            console.warn(`[Rastreo] ⚠️ Posición incompleta en mensaje:`, data);
+          }
+        } else if (data.evento === 'recorrido_finalizado' || data.evento === 'asignacion_cancelada') {
+          this.removerCamion(idAsignacion);
+        }
+      } catch (e) {
+        console.error('Error parseando mensaje WS:', e);
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error(`[Rastreo] ❌ Error en WebSocket ${idAsignacion}:`, error);
+    };
+
+    ws.onclose = (event) => {
+      console.log(`[Rastreo] 🔌 WebSocket cerrado para ${idAsignacion}. Código: ${event.code}, Razón: ${event.reason}`);
+      this.websockets.delete(idAsignacion);
+    };
+
+    this.websockets.set(idAsignacion, ws);
+  }
+
+  private actualizarPosicionCamion(idAsignacion: number, lon: number, lat: number, idRuta?: string): void {
+    if (!this.capaCamiones) {
+      console.error('[Rastreo] ❌ Capa de camiones no inicializada');
+      return;
+    }
+    const source = this.capaCamiones.getSource();
+    if (!source) return;
+
+    let feature = this.camionesFeatures.get(idAsignacion);
+
+    if (!feature) {
+      console.log(`[Rastreo] 🚚 Creando nueva feature para camión ${idAsignacion}`);
+      feature = new Feature({
+        geometry: new Point(fromLonLat([lon, lat])),
+        type: 'camion',
+        idAsignacion: idAsignacion,
+        idRuta: idRuta || 'Desconocida'
+      });
+
+      // Estilo ultra-visible: Círculo blanco + Texto (Emoji)
+      // Esto garantiza que se vea incluso si el SVG falla
+      const estiloCamion = [
+        new Style({
+          image: new CircleStyle({
+            radius: 20,
+            fill: new Fill({ color: '#fff' }),
+            stroke: new Stroke({ color: '#000', width: 2 })
+          })
+        }),
+        new Style({
+          text: new Text({
+            text: '🚛',
+            scale: 2.5,
+            offsetY: 0
+          })
+        })
+      ];
+
+      feature.setStyle(estiloCamion);
+      source.addFeature(feature);
+      this.camionesFeatures.set(idAsignacion, feature);
+
+      // Centrar el mapa en el camión la primera vez
+      this.mapa?.getView().animate({
+        center: fromLonLat([lon, lat]),
+        zoom: 16,
+        duration: 1000
+      });
+    } else {
+      const geometry = feature.getGeometry() as Point;
+      if (geometry) {
+        geometry.setCoordinates(fromLonLat([lon, lat]));
+      }
+    }
+  }
+
+  private removerCamion(idAsignacion: number): void {
+    // Cerrar WS
+    const ws = this.websockets.get(idAsignacion);
+    if (ws) {
+      ws.close();
+      this.websockets.delete(idAsignacion);
+    }
+
+    // Remover marcador
+    if (this.capaCamiones) {
+      const source = this.capaCamiones.getSource();
+      const feature = this.camionesFeatures.get(idAsignacion);
+      if (source && feature) {
+        source.removeFeature(feature);
+      }
+    }
+    this.camionesFeatures.delete(idAsignacion);
+  }
+  private iniciarPopup(): void {
+    if (!this.mapa) return;
+
+    // Crear el elemento HTML del popup dinámicamente
+    const container = document.createElement('div');
+    container.id = 'popup-camion';
+    container.style.background = 'rgba(10, 25, 47, 0.95)';
+    container.style.color = '#fff';
+    container.style.padding = '10px 15px';
+    container.style.borderRadius = '8px';
+    container.style.border = '1px solid #00E5FF';
+    container.style.fontSize = '14px';
+    container.style.boxShadow = '0 4px 15px rgba(0,0,0,0.5)';
+    container.style.minWidth = '180px';
+    container.style.pointerEvents = 'none';
+    container.style.display = 'none';
+    container.style.position = 'absolute';
+    container.style.zIndex = '1000';
+    
+    document.body.appendChild(container);
+
+    this.popupOverlay = new Overlay({
+      element: container,
+      autoPan: {
+        animation: {
+          duration: 250
+        }
+      },
+      offset: [0, -40] // Desplazar hacia arriba para no tapar el icono
+    });
+
+    this.mapa.addOverlay(this.popupOverlay);
+  }
+
+  private mostrarPopupCamion(feature: any, coordinate: any): void {
+    const element = this.popupOverlay.getElement();
+    const idRuta = feature.get('idRuta');
+    const idAsig = feature.get('idAsignacion');
+
+    element.innerHTML = `
+      <div style="font-weight: bold; color: #00E5FF; margin-bottom: 4px;">🚛 Camión en Tiempo Real</div>
+      <div style="margin-bottom: 2px;">Ruta: <span style="color: #00FF88;">${idRuta}</span></div>
+      <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">ID Seguimiento: #${idAsig}</div>
+      <div style="font-size: 10px; color: #00FF88; margin-top: 4px;">● Transmitiendo en vivo</div>
+    `;
+    
+    element.style.display = 'block';
+    this.popupOverlay.setPosition(coordinate);
+  }
+
+  private ocultarPopup(): void {
+    if (this.popupOverlay) {
+      const element = this.popupOverlay.getElement();
+      if (element) element.style.display = 'none';
     }
   }
 }
