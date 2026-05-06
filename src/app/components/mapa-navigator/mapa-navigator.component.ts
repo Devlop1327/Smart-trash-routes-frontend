@@ -53,7 +53,6 @@ export class MapaNavigatorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.route.queryParams.subscribe(params => {
       if (params['rutaId']) {
         this.rutaIdFromQuery.set(params['rutaId']);
-        console.log('📍 Ruta seleccionada desde URL:', params['rutaId']);
       }
     });
 
@@ -62,7 +61,6 @@ export class MapaNavigatorComponent implements OnInit, AfterViewInit, OnDestroy 
 
     // Polling automático cada 2 minutos - usa cache si no ha cambiado
     this.pollingSubscription = interval(120000).subscribe(() => {
-      console.log('🔄 Polling automático (usará cache si está fresco)');
       this.cargarRutasAdmin(false);
     });
   }

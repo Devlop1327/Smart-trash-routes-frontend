@@ -16,6 +16,7 @@ import { searchOutline, closeOutline, mapOutline, chevronForwardOutline, checkma
 export class RouteSelectorComponent implements OnInit {
   @Input() routes: Ruta[] = [];
   @Input() selectedRutaId: string | null = null;
+  @Input() activeAssignments: any[] = [];
 
   private modalCtrl = inject(ModalController);
   searchText = signal('');
@@ -25,6 +26,10 @@ export class RouteSelectorComponent implements OnInit {
   }
 
   ngOnInit() {}
+
+  isRutaActiva(idRuta: string | number): boolean {
+    return this.activeAssignments.some(asig => asig.id_ruta === idRuta);
+  }
 
   filteredRoutes = computed(() => {
     const term = this.searchText().toLowerCase().trim();

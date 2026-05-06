@@ -1,0 +1,57 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="premium-toolbar">
+    <ion-title>Rutas en Vivo</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding modal-content-bg">
+  <div class="modal-header-desc">
+    <div class="live-badge">
+      <span class="pulse-dot"></span>
+      EN VIVO
+    </div>
+    <p>
+      @if (assignments.length === 0) {
+        No hay camiones en servicio en este momento.
+      } @else if (assignments.length === 1) {
+        Hay 1 camión recolectando basura ahora mismo.
+      } @else {
+        Hay {{ assignments.length }} camiones recolectando basura ahora mismo.
+      }
+    </p>
+  </div>
+
+  @if (assignments.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon-circle">
+        <ion-icon name="bus-outline"></ion-icon>
+      </div>
+      <h3>No hay camiones en ruta</h3>
+      <p>Vuelve a consultar más tarde para ver el rastreo en vivo.</p>
+    </div>
+  } @else {
+    <div class="live-list">
+      @for (asig of assignments; track asig.id_asignacion) {
+        <div class="live-item-card">
+          <div class="item-icon">
+            <ion-icon name="bus"></ion-icon>
+          </div>
+          <div class="item-info">
+            <div class="route-name">{{ asig.ruta?.nombre_ruta || 'Ruta sin nombre' }}</div>
+            <div class="vehicle-plate">Vehículo: <span>{{ asig.vehiculo?.placa || 'N/A' }}</span></div>
+            <div class="driver-name">Conductor: {{ asig.conductor?.nombre || 'Asignado' }}</div>
+          </div>
+          <button class="track-btn" (click)="verEnMapa(asig)">
+            <ion-icon name="map-outline"></ion-icon>
+            <span>Ver</span>
+          </button>
+        </div>
+      }
+    </div>
+  }
+</ion-content>

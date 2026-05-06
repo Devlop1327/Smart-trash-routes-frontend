@@ -48,22 +48,56 @@
       </div>
     </div>
 
-    <!-- Tracking Section -->
-    @if (rutaEnProgreso(); as ruta) {
-      <div class="tracking-section">
-        <div class="section-header-flex">
+    <!-- Tracking Section (Unified) -->
+    <div class="tracking-section">
+      <div class="section-header-flex">
+        <div class="flex items-center gap-2">
           <h2 class="section-title-std">Tu Recolección</h2>
-          <button class="change-route-chip" (click)="seleccionarRuta()">
-            <ion-icon name="radioButtonOnOutline"></ion-icon>
-            Cambiar Ruta
-          </button>
+          @if (liveTrackingCount() > 0) {
+            <div class="live-indicator-mini" style="margin-bottom: 8px;">
+              <span class="dot"></span>
+              {{ liveTrackingCount() }} EN VIVO
+            </div>
+          }
         </div>
-        
+        <button class="change-route-chip" (click)="seleccionarRuta()">
+          <ion-icon name="radioButtonOnOutline"></ion-icon>
+          Cambiar Ruta
+        </button>
+      </div>
+
+      <!-- Tarjeta Informativa de Ruta Seleccionada (Siempre fija) -->
+      @let info = infoRutaSeleccionada();
+      <div class="native-card info-selected-route" 
+           style="margin-bottom: 16px; border: 1px solid rgba(0, 229, 255, 0.15); pointer-events: none; background: rgba(10, 25, 47, 0.4);">
+        <div class="card-icon-circle" 
+             [style.background-color]="info.activa ? 'rgba(0, 229, 255, 0.1)' : 'rgba(255,255,255,0.05)'"
+             [style.color]="info.activa ? '#00E5FF' : (info.seleccionada ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.2)')">
+          <ion-icon [name]="info.activa ? 'bus' : (info.seleccionada ? 'bus-outline' : 'help-circle-outline')"></ion-icon>
+        </div>
+        <div class="card-info">
+          <span class="card-title" style="font-size: 14px;">{{ info.nombre }}</span>
+          <span class="card-subtitle" 
+                [style.color]="info.activa ? '#00E5FF' : (info.mensaje.includes('Buscando') ? '#FFB74D' : (info.seleccionada ? '#ff4d4d' : 'rgba(255,255,255,0.4)'))" 
+                [style.font-weight]="info.activa ? '700' : '500'">
+            {{ info.activa ? info.distancia + ' - Llega: ' + info.horaLlegada : info.mensaje }}
+          </span>
+        </div>
+        @if (info.activa) {
+          <div class="live-indicator-mini" style="margin-right: 8px;">
+            <span class="dot"></span>
+            {{ info.tiempo }} min
+          </div>
+        }
+      </div>
+      
+      @if (rutaEnProgreso(); as ruta) {
+        <!-- Caso 1: Camión viniendo hacia el usuario -->
         <div class="tracking-card-std" (click)="abrirMapa()" routerLink="/mapa" style="cursor: pointer;">
           <div class="tracking-header">
             <div class="status-indicator">
               <span class="pulse-dot"></span>
-              <span class="status-text">En camino</span>
+              <span class="status-text">En camino a tu zona</span>
             </div>
             <span class="arrival-time">Llega: {{ ruta.horaLlegada }}</span>
           </div>
@@ -84,8 +118,38 @@
             </div>
           </div>
         </div>
-      </div>
-    }
+      } @else if (activeVehiclesCount() > 0) {
+        <!-- Caso 2: Hay camiones activos pero no en la zona del usuario -->
+        <div class="native-card live-vehicles-card-bg" (click)="abrirVehiculosEnRuta()">
+          <div class="card-icon-circle active-pulse">
+            <ion-icon name="bus-outline"></ion-icon>
+          </div>
+          <div class="card-info">
+            <span class="card-title">Servicio en curso</span>
+            <span class="card-subtitle">
+              {{ activeVehiclesCount() }} camión(es) trabajando en otras zonas
+            </span>
+          </div>
+          <div class="live-indicator-mini">
+            <span class="dot"></span>
+            VIVO
+          </div>
+          <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+        </div>
+      } @else {
+        <!-- Caso 3: No hay actividad en el sistema -->
+        <div class="native-card inactive-tracking-card" (click)="seleccionarRuta()">
+          <div class="card-icon-circle muted">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+          <div class="card-info">
+            <span class="card-title">Sin recolección activa</span>
+            <span class="card-subtitle">No hay camiones trabajando ahora mismo</span>
+          </div>
+          <ion-icon name="chevron-forward-outline" class="arrow-icon"></ion-icon>
+        </div>
+      }
+    </div>
 
     <!-- Calendar Section -->
     <div class="calendar-section-std">

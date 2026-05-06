@@ -22,6 +22,11 @@ export class MapaPage implements ViewWillEnter {
   
   mostrarSelectorRutas = signal(false);
   searchTerm = signal('');
+  today = new Date();
+
+  // Seguimiento en vivo
+  trackingStatus = this.mapaService.trackingStatus;
+  trackingCount = this.mapaService.trackingCount;
 
   ionViewWillEnter() {
     this.menuCtrl.enable(true, 'main-menu');

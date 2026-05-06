@@ -68,3 +68,12 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Security and Environments
+src/environments/environment.ts
+src/environments/environment.prod.ts
+.env
+*.env
+auth-config.json
+google-services.json
+GoogleService-Info.plist

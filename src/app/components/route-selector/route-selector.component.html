@@ -29,7 +29,12 @@
           <ion-icon name="map-outline"></ion-icon>
         </div>
         <div class="route-info">
-          <span class="route-name">{{ ruta.nombre_ruta }}</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="route-name">{{ ruta.nombre_ruta }}</span>
+            @if (isRutaActiva(ruta.id_ruta)) {
+              <span class="live-tag">VIVO</span>
+            }
+          </div>
           <span class="route-sector">Sector {{ ruta.nombre_ruta.split(' ')[1] || 'General' }}</span>
         </div>
         <div class="action-icon">

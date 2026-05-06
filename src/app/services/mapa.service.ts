@@ -55,6 +55,15 @@ export class MapaService {
   private popupOverlay: any = null;
   private camionesFeatures: globalThis.Map<number, Feature> = new globalThis.Map();
   private websockets: globalThis.Map<number, WebSocket> = new globalThis.Map();
+  private asignacionesActivasMap: globalThis.Map<number, any> = new globalThis.Map();
+
+  // Estados de conexión para la UI
+  private _trackingStatus = signal<'conectando' | 'conectado' | 'error' | 'inactivo'>('inactivo');
+  private _trackingCount = signal<number>(0);
+
+  readonly trackingStatus = this._trackingStatus.asReadonly();
+  readonly trackingCount = this._trackingCount.asReadonly();
+  readonly camionesPositions = signal<globalThis.Map<number, [number, number]>>(new globalThis.Map());
 
   readonly posicionUsuarioSignal = this.posicionUsuario.asReadonly();
   readonly puntosRecogidaSignal = this.puntosRecogida.asReadonly();
@@ -65,7 +74,8 @@ export class MapaService {
   private rutasService = inject(RutasService);
 
   constructor() {
-    // Puntos de recogida eliminados - ahora solo mostramos rutas del admin
+    this.obtenerPosicionActual();
+    this.iniciarRastreoCamiones();
   }
 
   inicializarMapa(target: string): Map {
@@ -105,11 +115,9 @@ export class MapaService {
       })
     });
 
-    this.obtenerPosicionActual();
     this.cargarCallesBuenaventura();
     this.iniciarCapaCamiones();
     this.iniciarPopup();
-    this.iniciarRastreoCamiones();
     
     setTimeout(() => {
       this.mapa?.updateSize();
@@ -635,11 +643,26 @@ export class MapaService {
   private consultarAsignacionesActivas(): void {
     this.rutasService.obtenerAsignacionesActivas().subscribe({
       next: (asignaciones) => {
+        if (asignaciones.length > 0) {
+          this._trackingStatus.set('conectando');
+        } else {
+          this._trackingStatus.set('inactivo');
+        }
+
         asignaciones.forEach(asig => {
+          // Guardar la información completa de la asignación
+          if (asig.id_asignacion) {
+            this.asignacionesActivasMap.set(asig.id_asignacion, asig);
+          }
           this.conectarWebSocketCamion(asig.id_asignacion);
         });
+        
+        this._trackingCount.set(this.websockets.size);
       },
-      error: (err) => console.error('Error obteniendo asignaciones activas:', err)
+      error: (err) => {
+        console.error('Error obteniendo asignaciones activas:', err);
+        this._trackingStatus.set('error');
+      }
     });
   }
 
@@ -658,12 +681,16 @@ export class MapaService {
 
     ws.onopen = () => {
       console.log(`[Rastreo] ✅ Conectado exitosamente al camión ${idAsignacion}`);
+      this._trackingStatus.set('conectado');
+      this.websockets.set(idAsignacion, ws);
+      this._trackingCount.set(this.websockets.size);
     };
 
     ws.onmessage = (event) => {
-      console.log(`[Rastreo] 📩 Mensaje recibido para ${idAsignacion}:`, event.data);
       try {
         const data = JSON.parse(event.data);
+        console.log(`[Rastreo] 📩 Evento recibido para ${idAsignacion}:`, data.evento, data);
+        
         if (data.evento === 'posicion_actualizada') {
           const lat = data.latitud !== undefined ? data.latitud : (data.data && data.data.lat);
           const lon = data.longitud !== undefined ? data.longitud : (data.data && data.data.lon);
@@ -684,14 +711,17 @@ export class MapaService {
 
     ws.onerror = (error) => {
       console.error(`[Rastreo] ❌ Error en WebSocket ${idAsignacion}:`, error);
+      this._trackingStatus.set('error');
     };
 
     ws.onclose = (event) => {
       console.log(`[Rastreo] 🔌 WebSocket cerrado para ${idAsignacion}. Código: ${event.code}, Razón: ${event.reason}`);
       this.websockets.delete(idAsignacion);
+      this._trackingCount.set(this.websockets.size);
+      if (this.websockets.size === 0) {
+        this._trackingStatus.set('inactivo');
+      }
     };
-
-    this.websockets.set(idAsignacion, ws);
   }
 
   private actualizarPosicionCamion(idAsignacion: number, lon: number, lat: number, idRuta?: string): void {
@@ -704,13 +734,19 @@ export class MapaService {
 
     let feature = this.camionesFeatures.get(idAsignacion);
 
+    // Obtener información rica de la asignación
+    const infoAsig = this.asignacionesActivasMap.get(idAsignacion);
+    const nombreRuta = infoAsig?.ruta?.nombre_ruta || idRuta || infoAsig?.id_ruta || 'Desconocida';
+    const placaVehiculo = infoAsig?.vehiculo?.placa || 'Desconocido';
+
     if (!feature) {
       console.log(`[Rastreo] 🚚 Creando nueva feature para camión ${idAsignacion}`);
       feature = new Feature({
         geometry: new Point(fromLonLat([lon, lat])),
         type: 'camion',
         idAsignacion: idAsignacion,
-        idRuta: idRuta || 'Desconocida'
+        nombreRuta: nombreRuta,
+        placaVehiculo: placaVehiculo
       });
 
       // Estilo ultra-visible: Círculo blanco + Texto (Emoji)
@@ -735,6 +771,8 @@ export class MapaService {
       feature.setStyle(estiloCamion);
       source.addFeature(feature);
       this.camionesFeatures.set(idAsignacion, feature);
+      
+      console.log(`[Rastreo] ✨ Marcador creado y añadido al mapa para ${idAsignacion}`);
 
       // Centrar el mapa en el camión la primera vez
       this.mapa?.getView().animate({
@@ -743,11 +781,21 @@ export class MapaService {
         duration: 1000
       });
     } else {
+      console.log(`[Rastreo] 📍 Moviendo marcador existente para ${idAsignacion} a ${lon}, ${lat}`);
       const geometry = feature.getGeometry() as Point;
       if (geometry) {
         geometry.setCoordinates(fromLonLat([lon, lat]));
       }
+      // Actualizar información por si cambió
+      feature.set('nombreRuta', nombreRuta);
+      feature.set('placaVehiculo', placaVehiculo);
     }
+
+    // Actualizar señal de posiciones para componentes externos (Dashboard)
+    this.camionesPositions.update(map => {
+      map.set(idAsignacion, [lon, lat]);
+      return new globalThis.Map(map);
+    });
   }
 
   private removerCamion(idAsignacion: number): void {
@@ -804,14 +852,22 @@ export class MapaService {
 
   private mostrarPopupCamion(feature: any, coordinate: any): void {
     const element = this.popupOverlay.getElement();
-    const idRuta = feature.get('idRuta');
+    const nombreRuta = feature.get('nombreRuta');
+    const placa = feature.get('placaVehiculo');
     const idAsig = feature.get('idAsignacion');
 
     element.innerHTML = `
-      <div style="font-weight: bold; color: #00E5FF; margin-bottom: 4px;">🚛 Camión en Tiempo Real</div>
-      <div style="margin-bottom: 2px;">Ruta: <span style="color: #00FF88;">${idRuta}</span></div>
-      <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">ID Seguimiento: #${idAsig}</div>
-      <div style="font-size: 10px; color: #00FF88; margin-top: 4px;">● Transmitiendo en vivo</div>
+      <div style="font-weight: bold; color: #00E5FF; margin-bottom: 6px; border-bottom: 1px solid rgba(0,229,255,0.2); padding-bottom: 4px;">
+        ${nombreRuta}
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 3px; font-size: 13px;">
+        <div>Placa: <span style="color: #00FF88; font-weight: bold;">${placa}</span></div>
+        <div style="font-size: 11px; opacity: 0.7;">ID Asig: #${idAsig}</div>
+        <div style="font-size: 10px; color: #00FF88; margin-top: 4px; display: flex; items-center; gap: 4px;">
+          <span style="display: inline-block; width: 6px; height: 6px; background: #00FF88; border-radius: 50%; animation: pulse 1s infinite;"></span>
+          En vivo
+        </div>
+      </div>
     `;
     
     element.style.display = 'block';
@@ -822,6 +878,31 @@ export class MapaService {
     if (this.popupOverlay) {
       const element = this.popupOverlay.getElement();
       if (element) element.style.display = 'none';
+    }
+  }
+
+  /**
+   * Enfoca el mapa en un camión específico
+   */
+  public enfocarCamion(idAsignacion: number): void {
+    const feature = this.camionesFeatures.get(idAsignacion);
+    if (feature && this.mapa) {
+      const geometry = feature.getGeometry() as Point;
+      if (geometry) {
+        const coords = geometry.getCoordinates();
+        this.mapa.getView().animate({
+          center: coords,
+          zoom: 17,
+          duration: 1000
+        });
+        
+        // Mostrar popup automáticamente al enfocar
+        setTimeout(() => {
+          this.mostrarPopupCamion(feature, coords);
+        }, 1100);
+      }
+    } else {
+      console.warn(`[MapaService] No se encontró el camión con ID ${idAsignacion} para enfocar.`);
     }
   }
 }

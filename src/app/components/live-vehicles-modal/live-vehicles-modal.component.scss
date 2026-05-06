@@ -1,0 +1,223 @@
+.premium-toolbar {
+  --background: #ffffff;
+  --color: #1e293b;
+  --border-width: 0;
+  padding: 8px;
+
+  ion-title {
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+  }
+
+  ion-button {
+    --color: #64748b;
+    --background: #f1f5f9;
+    --border-radius: 12px;
+    height: 36px;
+    width: 36px;
+  }
+}
+
+.modal-content-bg {
+  --background: #f8fafc;
+}
+
+.modal-header-desc {
+  margin-bottom: 24px;
+  
+  .live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fee2e2;
+    color: #ef4444;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 800;
+    margin-bottom: 8px;
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: pulse-red 1.5s infinite;
+    }
+  }
+
+  p {
+    margin: 0;
+    font-size: 15px;
+    color: #64748b;
+    font-weight: 500;
+  }
+}
+
+.live-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.live-item-card {
+  background: white;
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f1f5f9;
+
+  .item-icon {
+    width: 48px;
+    height: 48px;
+    background: #eff6ff;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    ion-icon {
+      font-size: 24px;
+      color: #3b82f6;
+    }
+  }
+
+  .item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .route-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 2px;
+    }
+
+    .vehicle-plate {
+      font-size: 13px;
+      color: #64748b;
+      
+      span {
+        color: #059669;
+        font-weight: 700;
+      }
+    }
+
+    .driver-name {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+  }
+
+  .track-btn {
+    background: #1e293b;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-weight: 700;
+    font-size: 11px;
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: scale(0.95);
+      background: #0f172a;
+    }
+
+    ion-icon {
+      font-size: 18px;
+    }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+
+  .empty-icon-circle {
+    width: 80px;
+    height: 80px;
+    background: #f1f5f9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    ion-icon {
+      font-size: 40px;
+      color: #cbd5e1;
+    }
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0 0 8px;
+  }
+
+  p {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+:host-context(.dark) {
+  .premium-toolbar {
+    --background: #0f172a;
+    --color: #f8fafc;
+    
+    ion-button {
+      --background: rgba(255, 255, 255, 0.05);
+      --color: #94a3b8;
+    }
+  }
+
+  .modal-content-bg {
+    --background: #020617;
+  }
+
+  .live-item-card {
+    background: #0f172a;
+    border-color: rgba(255, 255, 255, 0.05);
+    
+    .item-info {
+      .route-name { color: white; }
+      .vehicle-plate { color: #94a3b8; }
+    }
+
+    .item-icon {
+      background: rgba(59, 130, 246, 0.1);
+    }
+
+    .track-btn {
+      background: #3b82f6;
+    }
+  }
+
+  .empty-icon-circle {
+    background: #0f172a;
+  }
+}

@@ -96,6 +96,7 @@
 
   &.map-card-bg { background: linear-gradient(135deg, #ffffff, #f0fdf4); border: 1px solid #dcfce7; }
   &.routes-card-bg { background: linear-gradient(135deg, #ffffff, #eff6ff); border: 1px solid #dbeafe; }
+  &.live-vehicles-card-bg { background: linear-gradient(135deg, #ffffff, #fffbeb); border: 1px solid #fef3c7; }
 
   .card-icon-circle {
     width: 50px;
@@ -110,6 +111,7 @@
 
   .map-card-bg .card-icon-circle { background: #dcfce7; ion-icon { color: #059669; } }
   .routes-card-bg .card-icon-circle { background: #dbeafe; ion-icon { color: #3b82f6; } }
+  .live-vehicles-card-bg .card-icon-circle { background: rgba(217, 119, 6, 0.1); ion-icon { color: #d97706; } }
 
   .card-info {
     flex: 1;
@@ -120,7 +122,47 @@
     .card-subtitle { font-size: 13px; color: #64748b; margin-top: 2px; }
   }
 
+  :host-context(.dark) &,
+  :host-context([data-theme='dark']) & {
+    &.live-vehicles-card-bg {
+      background: #001D39; 
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      .card-title { color: white; }
+      .card-subtitle { color: rgba(255, 255, 255, 0.6); }
+      .card-icon-circle { background: rgba(251, 191, 36, 0.15); ion-icon { color: #fbbf24; } }
+      .arrow-icon { color: rgba(255, 255, 255, 0.3); }
+    }
+  }
+
+  .live-indicator-mini {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #fee2e2;
+    color: #ef4444;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 9px;
+    font-weight: 900;
+    margin-right: 8px;
+
+    .dot {
+      width: 5px;
+      height: 5px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: pulse-red 1s infinite;
+    }
+  }
+
   .arrow-icon { font-size: 20px; color: #cbd5e1; }
+}
+
+@keyframes pulse-red {
+  0% { transform: scale(0.9); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.5; }
+  100% { transform: scale(0.9); opacity: 1; }
 }
 
 .tracking-section {
@@ -375,5 +417,12 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
       .day-n { color: #001D39; font-weight: 800; } 
     }
+  }
+
+  .live-indicator-mini {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    .dot { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+    color: #fca5a5;
   }
 }

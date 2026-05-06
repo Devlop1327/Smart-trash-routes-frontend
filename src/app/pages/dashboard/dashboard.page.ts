@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { AlertController, ActionSheetController, ModalController, MenuController, IonIcon, IonMenuButton } from '@ionic/angular/standalone';
@@ -7,6 +7,8 @@ import { RutasService, Ruta } from '../../services/rutas.service';
 import { NotificationsService } from '../../services/notifications.service';
 import { NotificationCenterComponent } from '../../components/notification-center/notification-center.component';
 import { RouteSelectorComponent } from '../../components/route-selector/route-selector.component';
+import { LiveVehiclesModalComponent } from '../../components/live-vehicles-modal/live-vehicles-modal.component';
+import { MapaService } from '../../services/mapa.service';
 import { HttpClientModule } from '@angular/common/http';
 import { 
   menuOutline, 
@@ -23,7 +25,8 @@ import {
   moon,
   sunny,
   closeOutline,
-  person
+  person,
+  timeOutline
 } from 'ionicons/icons';
 
 interface EstadoRecoleccion {
@@ -51,7 +54,7 @@ interface DiaCalendario {
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage implements OnInit, OnDestroy {
   private router = inject(Router);
   private rutasService = inject(RutasService);
   private alertController = inject(AlertController);
@@ -59,6 +62,10 @@ export class DashboardPage implements OnInit {
   private modalController = inject(ModalController);
   private menuCtrl = inject(MenuController);
   public notificationsService = inject(NotificationsService);
+  private mapaService = inject(MapaService);
+  private pollInterval: any;
+
+  public liveTrackingCount = this.mapaService.trackingCount;
 
   constructor() {
     addIcons({
@@ -69,7 +76,8 @@ export class DashboardPage implements OnInit {
       bus,
       chevronForwardOutline,
       radioButtonOnOutline,
-      busOutline
+      busOutline,
+      timeOutline
     });
   }
 
@@ -80,15 +88,117 @@ export class DashboardPage implements OnInit {
   // Signals para datos reactivos
   rutas = signal<Ruta[]>([]);
   cargandoRutas = signal<boolean>(true);
-  rutaEnProgreso = signal<EstadoRecoleccion | null>(null);
+  activeAssignments = signal<any[]>([]);
+  activeVehiclesCount = computed(() => this.activeAssignments().length);
+  rutaSeleccionadaUsuario = signal<Ruta | null>(null);
+
+  infoRutaSeleccionada = computed(() => {
+    const ruta = this.rutaSeleccionadaUsuario();
+    const assignments = this.activeAssignments();
+    const truckPositions = this.mapaService.camionesPositions();
+    const userPos = this.mapaService.posicionUsuarioSignal();
+
+    if (!ruta) {
+      return {
+        seleccionada: false,
+        activa: false,
+        nombre: 'Sin selección',
+        mensaje: 'Selecciona una ruta para ver su estado'
+      };
+    }
+
+    // Buscar si esta ruta específica tiene una asignación activa
+    // Usamos == para permitir comparaciones entre string y number si fuera el caso
+    const asigActiva = assignments.find((asig: any) => 
+      asig.id_ruta == ruta.id_ruta || 
+      asig.ruta?.id_ruta == ruta.id_ruta
+    );
+    
+    if (!asigActiva) {
+      return {
+        seleccionada: true,
+        activa: false,
+        nombre: ruta.nombre_ruta,
+        mensaje: 'Este vehículo no está en circulación'
+      };
+    }
+
+    // Si hay asignación pero no tenemos GPS aún
+    if (!truckPositions.has(asigActiva.id_asignacion) || !userPos) {
+      return {
+        seleccionada: true,
+        activa: false, // Lo marcamos como no activa para el estilo, pero con mensaje diferente
+        nombre: ruta.nombre_ruta,
+        mensaje: 'En circulación (Buscando señal GPS...)'
+      };
+    }
+
+    // Calcular datos reales si está activa y tiene GPS
+    const truckPos = truckPositions.get(asigActiva.id_asignacion)!;
+    const distKm = this.calcularDistancia(userPos, truckPos);
+    
+    const tiempoMin = Math.max(1, Math.round((distKm / 25) * 60));
+    const ahora = new Date();
+    const llegada = new Date(ahora.getTime() + tiempoMin * 60000);
+
+    return {
+      seleccionada: true,
+      activa: true,
+      nombre: ruta.nombre_ruta,
+      mensaje: '', 
+      distancia: distKm < 1 ? `A ${Math.round(distKm * 1000)} metros` : `A ${distKm.toFixed(1)} km`,
+      tiempo: tiempoMin,
+      horaLlegada: llegada.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })
+    };
+  });
+
+  rutaEnProgreso = computed(() => {
+    const assignments = this.activeAssignments();
+    const userPos = this.mapaService.posicionUsuarioSignal();
+    const truckPositions = this.mapaService.camionesPositions();
+
+    if (!userPos || assignments.length === 0) return null;
+
+    // Filtrar asignaciones que tengan una posición de GPS conocida
+    const activeWithPos = assignments.filter((asig: any) => truckPositions.has(asig.id_asignacion));
+    
+    if (activeWithPos.length === 0) return null;
+
+    // Encontrar la más cercana al usuario
+    let closestAsig = activeWithPos[0];
+    let minDistance = Infinity;
+
+    activeWithPos.forEach((asig: any) => {
+      const truckPos = truckPositions.get(asig.id_asignacion)!;
+      const dist = this.calcularDistancia(userPos, truckPos);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestAsig = asig;
+      }
+    });
+
+    const truckPos = truckPositions.get(closestAsig.id_asignacion)!;
+    const distKm = this.calcularDistancia(userPos, truckPos);
+    
+    // Estimación simple: 25km/h promedio considerando paradas
+    const tiempoMin = Math.max(1, Math.round((distKm / 25) * 60)); 
+    
+    const ahora = new Date();
+    const llegada = new Date(ahora.getTime() + tiempoMin * 60000);
+
+    return {
+      estado: 'en_camino',
+      tiempoEstimado: tiempoMin,
+      horaLlegada: llegada.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
+      distancia: distKm < 1 ? `A ${Math.round(distKm * 1000)} metros` : `A ${distKm.toFixed(1)} km`,
+      nombreRuta: closestAsig.ruta?.nombre_ruta || 'Ruta activa'
+    } as EstadoRecoleccion;
+  });
 
   // Calendario semanal
   diasSemana: DiaCalendario[] = [];
 
   ngOnInit() {
-    // Inicializar con una simulación inmediata para evitar saltos en la UI
-    this.simularRutaEnProgreso(null);
-    
     this.cargarDatos();
     this.generarCalendario();
     this.cargarNotas();
@@ -101,6 +211,17 @@ export class DashboardPage implements OnInit {
         'info'
       );
     }
+
+    // Iniciar polling cada 10 segundos
+    this.pollInterval = setInterval(() => {
+      this.actualizarAsignacionesActivas();
+    }, 10000);
+  }
+
+  ngOnDestroy() {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+    }
   }
 
   cargarDatos() {
@@ -109,33 +230,34 @@ export class DashboardPage implements OnInit {
       next: (rutas) => {
         this.rutas.set(rutas);
         this.cargandoRutas.set(false);
-
-        // Simular una ruta en progreso (la primera ruta si existe)
-        if (rutas.length > 0) {
-          this.simularRutaEnProgreso(rutas[0]);
-        }
       },
       error: (err) => {
         console.error('Error cargando rutas:', err);
         this.cargandoRutas.set(false);
-        // Datos de fallback
-        this.simularRutaEnProgreso(null);
       }
+    });
+
+    this.actualizarAsignacionesActivas();
+  }
+
+  actualizarAsignacionesActivas() {
+    this.rutasService.obtenerAsignacionesActivas().subscribe({
+      next: (asignaciones) => {
+        this.activeAssignments.set(asignaciones);
+      },
+      error: (err) => console.error('Error cargando asignaciones activas:', err)
     });
   }
 
-  private simularRutaEnProgreso(ruta: Ruta | null) {
-    // Simulación de ruta en progreso - en producción vendría del backend
-    const ahora = new Date();
-    const horaLlegada = new Date(ahora.getTime() + 12 * 60000); // 12 minutos
-
-    this.rutaEnProgreso.set({
-      estado: 'en_camino',
-      tiempoEstimado: 12,
-      horaLlegada: horaLlegada.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }),
-      distancia: 'A 3 cuadras de tu ubicación',
-      nombreRuta: ruta?.nombre_ruta || 'Ruta Norte - Tu zona'
-    });
+  private calcularDistancia(p1: [number, number], p2: [number, number]): number {
+    const R = 6371; // Radio Tierra km
+    const dLat = (p2[1] - p1[1]) * Math.PI / 180;
+    const dLon = (p2[0] - p1[0]) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(p1[1] * Math.PI / 180) * Math.cos(p2[1] * Math.PI / 180) * 
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
   }
 
   private generarCalendario() {
@@ -255,7 +377,8 @@ export class DashboardPage implements OnInit {
       component: RouteSelectorComponent,
       componentProps: {
         routes: this.rutas(),
-        selectedRutaId: null // Podría persistir esto si fuera necesario
+        selectedRutaId: null,
+        activeAssignments: this.activeAssignments()
       },
       cssClass: 'premium-modal',
       initialBreakpoint: 0.8,
@@ -268,7 +391,7 @@ export class DashboardPage implements OnInit {
     const { data } = await modal.onWillDismiss();
     
     if (data) {
-      this.simularRutaEnProgreso(data);
+      this.rutaSeleccionadaUsuario.set(data);
       this.notificationsService.addNotification(
         'Ruta Seleccionada',
         `Ahora estás siguiendo la ruta: ${data.nombre_ruta}`,
@@ -294,6 +417,21 @@ export class DashboardPage implements OnInit {
 
   abrirRutas() {
     this.router.navigate(['/rutas']);
+  }
+
+  async abrirVehiculosEnRuta() {
+    const modal = await this.modalController.create({
+      component: LiveVehiclesModalComponent,
+      componentProps: {
+        assignments: this.activeAssignments()
+      },
+      cssClass: 'premium-modal',
+      initialBreakpoint: 0.7,
+      breakpoints: [0, 0.5, 0.7, 0.9],
+      handle: true
+    });
+
+    await modal.present();
   }
 
   async reportarIncidencia() {

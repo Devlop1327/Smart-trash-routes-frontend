@@ -22,6 +22,28 @@
       <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-500 hidden xs:inline">Explorar Rutas</span>
     </button>
   </header>
+  
+  <!-- Indicador de Seguimiento en Vivo -->
+  @if (!rutaSeleccionada()) {
+    <div class="tracking-indicator-float" 
+        [class.active]="trackingStatus() === 'conectado'"
+        [class.connecting]="trackingStatus() === 'conectando'"
+        [class.error]="trackingStatus() === 'error'"
+        [class.inactive]="trackingStatus() === 'inactivo'">
+      <div class="status-dot-pulse"></div>
+      <span class="status-label">
+        @if (trackingStatus() === 'conectado') {
+          {{ trackingCount() }} camión(es) en vivo
+        } @else if (trackingStatus() === 'conectando') {
+          Buscando camiones...
+        } @else if (trackingStatus() === 'error') {
+          Error de conexión
+        } @else {
+          Sin camiones activos
+        }
+      </span>
+    </div>
+  }
 
   <!-- Search Overlay Section removed -->
 
@@ -50,17 +72,17 @@
         
         <div class="grid grid-cols-2 gap-2 mb-4">
           <div class="bg-emerald-50/30 rounded-xl p-2 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary text-[16px] opacity-60">badge</span>
+            <span class="material-symbols-outlined text-primary dark:text-white text-[16px] opacity-60">badge</span>
             <div class="min-w-0">
               <p class="text-[8px] text-on-surface-variant font-semibold uppercase opacity-50">ID</p>
               <p class="font-bold text-on-surface text-[10px] truncate">{{ (rutaSeleccionada()?.id_ruta || '').split('-')[0] }}...</p>
             </div>
           </div>
           <div class="bg-emerald-50/30 rounded-xl p-2 flex items-center gap-2">
-            <span class="material-symbols-outlined text-emerald-700 text-[16px] opacity-60">calendar_today</span>
+            <span class="material-symbols-outlined text-emerald-700 dark:text-white text-[16px] opacity-60">calendar_today</span>
             <div>
               <p class="text-[8px] text-on-surface-variant font-semibold uppercase opacity-50">Fecha</p>
-              <p class="font-bold text-on-surface text-[10px]">{{ rutaSeleccionada()?.created_at | date:'dd/MM' }}</p>
+              <p class="font-bold text-on-surface text-[10px]">{{ today | date:'dd/MM/yyyy' }}</p>
             </div>
           </div>
         </div>
