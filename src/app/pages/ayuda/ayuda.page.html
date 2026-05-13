@@ -33,7 +33,7 @@
             <ion-icon [name]="faq.abierta ? 'chevron-up-outline' : 'chevron-down-outline'" class="arrow"></ion-icon>
           </div>
           <div class="faq-body" *ngIf="faq.abierta">
-            <p>{{ faq.respuesta }}</p>
+            <p [innerHTML]="faq.respuesta"></p>
           </div>
         </div>
       </div>

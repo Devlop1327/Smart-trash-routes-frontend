@@ -21,7 +21,12 @@ export class LiveVehiclesModalComponent {
   private mapaService = inject(MapaService);
 
   constructor() {
-    addIcons({ closeOutline, bus, mapOutline, busOutline });
+    addIcons({ 
+      'close-outline': closeOutline, 
+      'bus': bus, 
+      'map-outline': mapOutline, 
+      'bus-outline': busOutline 
+    });
   }
 
   cerrar() {

@@ -74,9 +74,9 @@ export class DashboardPage implements OnInit, OnDestroy {
       map,
       navigate,
       bus,
-      chevronForwardOutline,
-      radioButtonOnOutline,
-      busOutline,
+      'chevron-forward-outline': chevronForwardOutline,
+      'radio-button-on-outline': radioButtonOnOutline,
+      'bus-outline': busOutline,
       timeOutline
     });
   }

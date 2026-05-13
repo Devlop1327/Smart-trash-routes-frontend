@@ -61,7 +61,7 @@
           }
         </div>
         <button class="change-route-chip" (click)="seleccionarRuta()">
-          <ion-icon name="radioButtonOnOutline"></ion-icon>
+          <ion-icon name="radio-button-on-outline"></ion-icon>
           Cambiar Ruta
         </button>
       </div>
@@ -69,17 +69,17 @@
       <!-- Tarjeta Informativa de Ruta Seleccionada (Siempre fija) -->
       @let info = infoRutaSeleccionada();
       <div class="native-card info-selected-route" 
-           style="margin-bottom: 16px; border: 1px solid rgba(0, 229, 255, 0.15); pointer-events: none; background: rgba(10, 25, 47, 0.4);">
+           style="margin-bottom: 16px; border: 1px solid rgba(123, 189, 232, 0.3); pointer-events: none; background: linear-gradient(135deg, #001D39, #0A4174); box-shadow: 0 10px 25px rgba(0, 29, 57, 0.2);">
         <div class="card-icon-circle" 
-             [style.background-color]="info.activa ? 'rgba(0, 229, 255, 0.1)' : 'rgba(255,255,255,0.05)'"
-             [style.color]="info.activa ? '#00E5FF' : (info.seleccionada ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.2)')">
+             [style.background-color]="info.activa ? 'rgba(0, 229, 255, 0.15)' : 'rgba(255,255,255,0.1)'"
+             [style.color]="info.activa ? '#00E5FF' : (info.seleccionada ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.4)')">
           <ion-icon [name]="info.activa ? 'bus' : (info.seleccionada ? 'bus-outline' : 'help-circle-outline')"></ion-icon>
         </div>
         <div class="card-info">
-          <span class="card-title" style="font-size: 14px;">{{ info.nombre }}</span>
+          <span class="card-title" style="font-size: 15px; color: white;">{{ info.nombre }}</span>
           <span class="card-subtitle" 
-                [style.color]="info.activa ? '#00E5FF' : (info.mensaje.includes('Buscando') ? '#FFB74D' : (info.seleccionada ? '#ff4d4d' : 'rgba(255,255,255,0.4)'))" 
-                [style.font-weight]="info.activa ? '700' : '500'">
+                [style.color]="info.activa ? '#00E5FF' : (info.mensaje.includes('Buscando') ? '#FFB74D' : (info.seleccionada ? '#ff4d4d' : 'rgba(255,255,255,0.6)'))" 
+                [style.font-weight]="info.activa ? '800' : '500'">
             {{ info.activa ? info.distancia + ' - Llega: ' + info.horaLlegada : info.mensaje }}
           </span>
         </div>

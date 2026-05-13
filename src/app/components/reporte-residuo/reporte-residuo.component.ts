@@ -12,6 +12,21 @@ import { Geolocation } from '@capacitor/geolocation';
 import { HttpClient } from '@angular/common/http';
 import { TipoResiduo } from '../../services/mapa.service';
 import { environment } from '../../../environments/environment';
+import { addIcons } from 'ionicons';
+import { 
+  information, 
+  personOutline, 
+  mailOutline, 
+  pricetagOutline, 
+  documentTextOutline, 
+  scaleOutline, 
+  camera, 
+  trashOutline, 
+  refreshOutline, 
+  checkmarkCircleOutline, 
+  cameraOutline, 
+  arrowForwardOutline 
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-reporte-residuo',
@@ -38,6 +53,21 @@ export class ReporteResiduoComponent {
     private toastCtrl: ToastController,
     private http: HttpClient
   ) {
+    addIcons({
+      'information': information,
+      'person-outline': personOutline,
+      'mail-outline': mailOutline,
+      'pricetag-outline': pricetagOutline,
+      'document-text-outline': documentTextOutline,
+      'scale-outline': scaleOutline,
+      'camera': camera,
+      'trash-outline': trashOutline,
+      'refresh-outline': refreshOutline,
+      'checkmark-circle-outline': checkmarkCircleOutline,
+      'camera-outline': cameraOutline,
+      'arrow-forward-outline': arrowForwardOutline
+    });
+
     this.reporteForm = this.fb.group({
       nombre: ['', Validators.required],
       correo: ['', [Validators.required, Validators.email]],

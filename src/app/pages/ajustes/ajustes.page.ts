@@ -3,6 +3,15 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { Geolocation } from '@capacitor/geolocation';
 import { ThemeService } from '../../services/theme.service';
+import { MapaService } from '../../services/mapa.service';
+import { addIcons } from 'ionicons';
+import { 
+  menuOutline, 
+  moon, 
+  sunny, 
+  notificationsOutline, 
+  navigateOutline 
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-ajustes',
@@ -16,32 +25,84 @@ export class AjustesPage implements OnInit {
   gpsAlwaysActive = signal<boolean>(false);
   notificationsActive = signal<boolean>(true);
 
-  constructor(private themeService: ThemeService) {}
+  constructor(
+    private themeService: ThemeService,
+    private mapaService: MapaService
+  ) {
+    addIcons({ 
+      'menu-outline': menuOutline, 
+      'moon': moon, 
+      'sunny': sunny, 
+      'notifications-outline': notificationsOutline, 
+      'navigate-outline': navigateOutline 
+    });
+  }
 
   async ngOnInit() {
     await this.checkGpsPermission();
   }
 
+  private readonly GPS_KEY = 'str_gps_active';
+
   private async checkGpsPermission(): Promise<void> {
     try {
-      const permission = await Geolocation.requestPermissions();
-      // Check if location permission is granted
-      const hasLocation = permission.location === 'granted';
-      this.gpsAlwaysActive.set(hasLocation);
+      // Primero verificar el estado real de los permisos
+      const permission = await Geolocation.checkPermissions();
+      const isGranted = permission.location === 'granted';
+      
+      const saved = localStorage.getItem(this.GPS_KEY);
+      const isSavedActive = saved === 'true';
+
+      // Solo se activa si hay permiso real Y el usuario lo guardó como activo
+      this.gpsAlwaysActive.set(isGranted && isSavedActive);
+      
+      // Sincronizar localStorage si el permiso fue revocado externamente
+      if (!isGranted && isSavedActive) {
+        localStorage.setItem(this.GPS_KEY, 'false');
+      }
     } catch (error) {
-      console.error('Error checking GPS permission:', error);
-      this.gpsAlwaysActive.set(false);
+      console.warn('Error checking GPS permission (posiblemente entorno Web):', error);
+      const saved = localStorage.getItem(this.GPS_KEY);
+      this.gpsAlwaysActive.set(saved === 'true');
     }
   }
 
   async toggleGpsAlways(): Promise<void> {
     try {
-      const permission = await Geolocation.requestPermissions();
-      const isGranted = permission.location === 'granted';
-      this.gpsAlwaysActive.set(isGranted);
+      if (this.gpsAlwaysActive()) {
+        this.gpsAlwaysActive.set(false);
+        localStorage.setItem(this.GPS_KEY, 'false');
+      } else {
+        try {
+          const permission = await Geolocation.requestPermissions();
+          if (permission.location !== 'granted') {
+            console.warn('Permiso de ubicación denegado por el usuario.');
+            this.gpsAlwaysActive.set(false);
+            localStorage.setItem(this.GPS_KEY, 'false');
+            return;
+          }
+        } catch (e) {
+          console.warn('requestPermissions no soportado o falló, verificando estado actual...');
+          // Fallback para web: intentar obtener posición para disparar el prompt del navegador
+          try {
+            await Geolocation.getCurrentPosition();
+          } catch (posError) {
+            console.error('El usuario denegó el acceso en el navegador.');
+            this.gpsAlwaysActive.set(false);
+            localStorage.setItem(this.GPS_KEY, 'false');
+            return;
+          }
+        }
+        
+        // Si llegamos aquí, es que tenemos permiso
+        this.gpsAlwaysActive.set(true);
+        localStorage.setItem(this.GPS_KEY, 'true');
+        this.mapaService.obtenerPosicionActual();
+      }
     } catch (error) {
-      console.error('Error requesting GPS permission:', error);
+      console.error('Error general en toggle GPS:', error);
       this.gpsAlwaysActive.set(false);
+      localStorage.setItem(this.GPS_KEY, 'false');
     }
   }
 

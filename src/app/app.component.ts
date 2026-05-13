@@ -13,7 +13,8 @@ import {
   closeOutline,
   person,
   helpCircleOutline,
-  informationCircleOutline
+  informationCircleOutline,
+  menuOutline
 } from 'ionicons/icons';
 import {
   IonApp,
@@ -58,17 +59,18 @@ export class AppComponent {
 
   constructor() {
     addIcons({
-      personCircle,
-      homeOutline,
-      mapOutline,
-      alertCircleOutline,
-      settingsOutline,
-      moon,
-      sunny,
-      closeOutline,
-      person,
-      helpCircleOutline,
-      informationCircleOutline
+      'person-circle': personCircle,
+      'home-outline': homeOutline,
+      'map-outline': mapOutline,
+      'alert-circle-outline': alertCircleOutline,
+      'settings-outline': settingsOutline,
+      'moon': moon,
+      'sunny': sunny,
+      'close-outline': closeOutline,
+      'person': person,
+      'help-circle-outline': helpCircleOutline,
+      'information-circle-outline': informationCircleOutline,
+      'menu-outline': menuOutline
     });
     this.initializeApp();
   }

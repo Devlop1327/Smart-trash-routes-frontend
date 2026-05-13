@@ -44,9 +44,15 @@ export class AyudaPage {
     },
     {
       pregunta: '¿Las notificaciones son automáticas?',
-      respuesta: 'Sí, recibirás una notificación cuando el camión esté cerca de tu zona si tienes activada la opción en Ajustes.',
+      respuesta: 'Sí, recibirás una notificación cuando el camión esté cerca de tu zona si tienes activada la opción en Ajustes. Próximamente, podrás usar esta funcionalidad.',
       abierta: false,
       icon: 'notifications-outline'
+    },
+    {
+      pregunta: '¿Qué significan los colores de las calles en el mapa?',
+      respuesta: 'Los colores indican el tipo de vía:<br><br>🟩 <b>Verde Esmeralda:</b> Vías Principales.<br>🟦 <b>Cyan:</b> Vías Normales / Conectoras.<br>🟨 <b>Amarillo Dorado:</b> Calles Residenciales.<br>🟧 <b>Coral:</b> Zonas Peatonales.<br>🟪 <b>Púrpura:</b> Vías de Servicio.<br><br><i>La ruta del camión siempre está resaltada con un borde blanco grueso.</i>',
+      abierta: false,
+      icon: 'map-outline'
     }
   ];
 

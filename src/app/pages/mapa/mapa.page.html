@@ -25,7 +25,8 @@
   
   <!-- Indicador de Seguimiento en Vivo -->
   @if (!rutaSeleccionada()) {
-    <div class="tracking-indicator-float" 
+    <div class="tracking-indicator-float cursor-pointer" 
+        (click)="abrirModalVehiculos()"
         [class.active]="trackingStatus() === 'conectado'"
         [class.connecting]="trackingStatus() === 'conectando'"
         [class.error]="trackingStatus() === 'error'"
@@ -138,6 +139,9 @@
                 <span class="text-[10px] text-on-surface-variant opacity-60 uppercase font-semibold">Sector {{ ruta.nombre_ruta.split(' ')[1] || 'General' }}</span>
               </div>
               <div class="ml-auto flex items-center gap-2 flex-shrink-0">
+                @if (ruta.isLive) {
+                  <span class="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md animate-pulse uppercase tracking-tighter">Vivo</span>
+                }
                 @if (rutaSeleccionada()?.id_ruta === ruta.id_ruta) {
                   <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
                 }

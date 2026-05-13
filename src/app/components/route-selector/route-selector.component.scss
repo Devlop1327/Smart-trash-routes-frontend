@@ -65,9 +65,9 @@
       gap: 2px;
 
       .route-name {
-        font-size: 16px;
+        font-size: 18px;
         font-weight: 700;
-        color: white;
+        color: #001D39; /* Navy theme text for light mode */
       }
 
       .live-tag {
@@ -83,8 +83,8 @@
       }
 
       .route-sector {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.6);
+        font-size: 14px;
+        color: #64748b; /* Gray text for light mode */
       }
     }
 }
@@ -108,7 +108,7 @@
   text-align: center;
   color: #64748b;
 
-  .empty-icon { font-size: 64px; opacity: 0.2; margin-bottom: 16px; }
+  .empty-icon { font-size: 64px; opacity: 0.2; margin-bottom: 16px; color: inherit; }
   h3 { font-size: 18px; font-weight: 800; margin: 0; color: #1e293b; }
   p { font-size: 14px; margin-top: 4px; }
 }
